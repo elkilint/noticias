@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregador de Noticias | CNN · CBC · Infobae · La República</title>
+    <title>Agregador de Noticias Global</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
         body {
-            background: #f5f7fb;
+            background: #f0f4f8;
             padding: 20px;
         }
         .container {
@@ -21,13 +21,13 @@
         }
         h1 {
             text-align: center;
-            color: #1a2a3a;
+            color: #1e293b;
             margin-bottom: 8px;
             font-size: 1.8rem;
         }
         .sub {
             text-align: center;
-            color: #6c757d;
+            color: #64748b;
             margin-bottom: 30px;
             font-size: 0.9rem;
         }
@@ -47,19 +47,19 @@
             font-weight: 500;
             transition: all 0.2s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #dee2e6;
+            border: 1px solid #e2e8f0;
         }
         .filter-btn.active {
-            background: #2c5f8a;
+            background: #1e40af;
             color: white;
-            border-color: #2c5f8a;
+            border-color: #1e40af;
         }
         .filter-btn:hover:not(.active) {
-            background: #e9ecef;
+            background: #f1f5f9;
         }
         .portals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 24px;
         }
         .portal-card {
@@ -67,13 +67,14 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .portal-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
         .portal-header {
-            background: linear-gradient(135deg, #2c5f8a 0%, #1a3a52 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
             color: white;
             padding: 16px 20px;
             font-weight: bold;
@@ -85,7 +86,7 @@
         }
         .news-item {
             padding: 14px 18px;
-            border-bottom: 1px solid #edf2f7;
+            border-bottom: 1px solid #eef2ff;
             transition: background 0.15s;
         }
         .news-item:hover {
@@ -98,31 +99,45 @@
             display: block;
             margin-bottom: 8px;
             line-height: 1.4;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         .news-title:hover {
-            color: #2c5f8a;
+            color: #1e40af;
             text-decoration: underline;
         }
         .news-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
             font-size: 0.7rem;
         }
         .category-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             padding: 3px 10px;
-            background: #eef2ff;
+            background: #eff6ff;
             border-radius: 20px;
             font-size: 0.65rem;
             font-weight: 600;
-            color: #2c5f8a;
+            color: #1e40af;
+        }
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            color: #475569;
         }
         .loading, .error-msg {
             text-align: center;
             padding: 60px;
-            color: #6c757d;
+            color: #64748b;
         }
         .error-msg {
             color: #dc2626;
@@ -138,20 +153,41 @@
         .refresh-btn {
             display: block;
             margin: 20px auto 0;
-            padding: 8px 20px;
-            background: #2c5f8a;
+            padding: 10px 24px;
+            background: #1e40af;
             color: white;
             border: none;
             border-radius: 40px;
             cursor: pointer;
             font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .refresh-btn:hover {
+            background: #1e3a8a;
+        }
+        .stats {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📰 Panorama de Noticias</h1>
-    <div class="sub">CNN Español · CBC (Canada) · Infobae · La República Colombia</div>
+    <h1>📰 Agregador de Noticias</h1>
+    <div class="sub">CNN Español · CBC (Canadá) · Infobae · La República Colombia</div>
     
     <div class="filters">
         <button class="filter-btn active" data-filter="all">🌐 Todas</button>
@@ -165,39 +201,47 @@
     </div>
     
     <button class="refresh-btn" onclick="location.reload()">⟳ Actualizar noticias</button>
-    <footer>Fuentes: RSS públicos convertidos vía rss2json.com | Actualización automática al cargar</footer>
+    <footer>Fuentes: RSS vía rss2json.com | CNN e Infobae usan feeds alternativos de Google News | La República y CBC con feeds oficiales</footer>
 </div>
 
 <script>
     let currentFilter = "all";
     let allNewsData = {};
 
-    // Feeds verificados (RSS válidos)
+    // CONFIGURACIÓN DE PORTALES CON FEEDS CONFIRMADOS
+    // CNN e Infobae usan Google News RSS (solución para sitios sin RSS público)
+    // La República y CBC usan feeds oficiales
+    
     const PORTALS = [
         { 
             name: "CNN Español", 
-            rss: "https://cnnespanol.cnn.com/feed/",
-            lang: "es"
+            // Google News RSS para CNN en Español (solución para sitios sin RSS público)
+            rss: "https://news.google.com/rss/search?q=CNN+en+Español+noticias&hl=es-419&gl=US&ceid=US:es-419",
+            lang: "es",
+            isGoogleNews: true
         },
         { 
             name: "CBC News", 
             rss: "https://www.cbc.ca/cmlink/rss-topstories",
-            lang: "en"
+            lang: "en",
+            isGoogleNews: false
         },
         { 
             name: "Infobae", 
-            rss: "https://www.infobae.com/feeds/rss/",
-            lang: "es"
+            // Google News RSS para Infobae (solución para sitios sin RSS público)
+            rss: "https://news.google.com/rss/search?q=Infobae+Argentina+noticias&hl=es-419&gl=AR&ceid=AR:es-419",
+            lang: "es",
+            isGoogleNews: true
         },
         { 
             name: "La República", 
             rss: "https://www.larepublica.co/rss/economia",
-            lang: "es"
+            lang: "es",
+            isGoogleNews: false
         }
     ];
 
-    // Servicio RSS2JSON gratuito (sin CORS, funciona en navegador)
-    // Usamos rss2json.com que es gratuito y confiable
+    // Servicio RSS2JSON gratuito
     async function fetchRSSAsJSON(rssUrl) {
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
         try {
@@ -215,23 +259,22 @@
         }
     }
 
-    // Clasificar noticia por categoría (bilingüe)
+    // Clasificar noticia por categoría (bilingüe mejorado)
     function detectCategory(title, description, lang) {
         const text = (title + " " + description).toLowerCase();
         
-        // Palabras clave en español e inglés
         const keywords = {
             politica: {
-                es: ["política", "gobierno", "presidente", "congreso", "senado", "elección", "ministro", "ley", "voto", "cámara", "diputado"],
-                en: ["politics", "government", "president", "congress", "senate", "election", "minister", "law", "vote", "parliament", "prime minister"]
+                es: ["política", "gobierno", "presidente", "congreso", "senado", "elección", "ministro", "ley", "voto", "cámara", "diputado", "poder", "estado", "nación", "político"],
+                en: ["politics", "government", "president", "congress", "senate", "election", "minister", "law", "vote", "parliament", "prime minister", "cabinet", "political"]
             },
             economia: {
-                es: ["economía", "mercado", "empresa", "banco", "inversión", "dólar", "peso", "inflación", "pib", "finanzas", "comercio", "exportación"],
-                en: ["economy", "market", "business", "bank", "investment", "dollar", "inflation", "gdp", "finance", "trade", "stock"]
+                es: ["economía", "mercado", "empresa", "banco", "inversión", "dólar", "peso", "inflación", "pib", "finanzas", "comercio", "exportación", "importación", "bursátil", "financiero"],
+                en: ["economy", "market", "business", "bank", "investment", "dollar", "inflation", "gdp", "finance", "trade", "stock", "recession", "financial"]
             },
             tecnologia: {
-                es: ["tecnología", "software", "app", "internet", "digital", "inteligencia artificial", "ia", "robot", "innovación", "computación", "móvil", "apple", "google", "microsoft"],
-                en: ["technology", "tech", "software", "app", "digital", "artificial intelligence", "ai", "robot", "innovation", "computing", "mobile", "startup", "cyber"]
+                es: ["tecnología", "software", "app", "internet", "digital", "inteligencia artificial", "ia", "robot", "innovación", "computación", "móvil", "apple", "google", "microsoft", "startup", "cibernética", "computadora"],
+                en: ["technology", "tech", "software", "app", "digital", "artificial intelligence", "ai", "robot", "innovation", "computing", "mobile", "startup", "cyber", "computer", "device"]
             }
         };
         
@@ -239,17 +282,14 @@
         
         for (let cat of ["politica", "economia", "tecnologia"]) {
             const words = keywords[cat];
-            // Revisar español
             for (let kw of words.es) {
                 if (text.includes(kw)) scores[cat] += 2;
             }
-            // Revisar inglés
             for (let kw of words.en) {
                 if (text.includes(kw)) scores[cat] += 2;
             }
         }
         
-        // Encontrar categoría con mayor puntaje
         let maxCat = null;
         let maxScore = 0;
         for (let cat in scores) {
@@ -262,7 +302,30 @@
         return maxCat || "general";
     }
 
-    // Formatear fecha relativa
+    // Extraer sitio de origen del título (para feeds de Google News)
+    function extractSource(title) {
+        // Google News añade el nombre del sitio al final: "Título - CNN Español"
+        const patterns = [/\s+[-|]\s+([A-Za-z0-9\s]+)$/, /\s+[-|]\s+([A-Za-z0-9\s]+)\.?$/];
+        for (let pattern of patterns) {
+            const match = title.match(pattern);
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+        }
+        return null;
+    }
+
+    function cleanTitle(title, portalName) {
+        // Limpiar el sufijo de sitio para feeds de Google News
+        if (portalName === "CNN Español" || portalName === "Infobae") {
+            const patterns = [/\s+[-|]\s+[A-Za-z0-9\s]+$/, /\s+[-|]\s+[A-Za-z0-9\s]+\.?$/];
+            for (let pattern of patterns) {
+                title = title.replace(pattern, '');
+            }
+        }
+        return title.trim();
+    }
+
     function formatDate(dateString) {
         try {
             const date = new Date(dateString);
@@ -273,6 +336,7 @@
             const diffHours = Math.floor(diffMins / 60);
             const diffDays = Math.floor(diffHours / 24);
             
+            if (diffMins < 1) return "ahora mismo";
             if (diffMins < 60) return `hace ${diffMins} min`;
             if (diffHours < 24) return `hace ${diffHours} h`;
             if (diffDays < 7) return `hace ${diffDays} d`;
@@ -282,7 +346,6 @@
         }
     }
 
-    // Cargar todos los portales
     async function loadAllNews() {
         const container = document.getElementById("portalsContainer");
         container.innerHTML = '<div class="loading">🔄 Conectando con fuentes...<br><small>CNN · CBC · Infobae · La República</small></div>';
@@ -295,17 +358,21 @@
                 const items = await fetchRSSAsJSON(portal.rss);
                 
                 if (items && items.length > 0) {
-                    results[portal.name] = items.slice(0, 15).map(item => ({
-                        title: item.title,
-                        link: item.link,
-                        pubDate: item.pubDate,
-                        description: item.description?.replace(/<[^>]*>/g, '') || "",
-                        category: detectCategory(item.title, item.description || "", portal.lang)
-                    }));
+                    results[portal.name] = items.slice(0, 15).map(item => {
+                        let clean = cleanTitle(item.title, portal.name);
+                        return {
+                            title: clean,
+                            originalTitle: item.title,
+                            link: item.link,
+                            pubDate: item.pubDate,
+                            description: item.description?.replace(/<[^>]*>/g, '') || "",
+                            category: detectCategory(clean, item.description || "", portal.lang)
+                        };
+                    });
                     console.log(`✅ ${portal.name}: ${results[portal.name].length} noticias`);
                 } else {
                     results[portal.name] = [];
-                    console.log(`⚠️ ${portal.name}: Sin noticias o feed no disponible`);
+                    console.log(`⚠️ ${portal.name}: Feed no disponible`);
                 }
             } catch (error) {
                 console.error(`❌ Error en ${portal.name}:`, error);
@@ -317,59 +384,56 @@
         render();
     }
 
-    // Renderizar la interfaz
     function render() {
         const container = document.getElementById("portalsContainer");
         
-        // Verificar si hay al menos alguna noticia
         let hasAnyNews = false;
+        let totalNews = 0;
         for (let portal of PORTALS) {
             if (allNewsData[portal.name] && allNewsData[portal.name].length > 0) {
                 hasAnyNews = true;
-                break;
+                totalNews += allNewsData[portal.name].length;
             }
         }
         
         if (!hasAnyNews) {
             container.innerHTML = `<div class="error-msg">
                 ⚠️ No se pudieron cargar las noticias en este momento.<br><br>
-                <strong>Posibles causas:</strong><br>
+                <strong>Causas posibles:</strong><br>
                 • Los servidores RSS pueden estar temporalmente ocupados<br>
                 • Tu conexión a internet podría ser inestable<br><br>
                 <strong>Soluciones:</strong><br>
                 • Haz clic en "Actualizar noticias"<br>
-                • Espera 30 segundos y recarga la página<br>
+                • Espera 15 segundos y recarga la página (F5)<br>
                 • Verifica que no tengas bloqueado api.rss2json.com<br><br>
-                <small>El servicio rss2json.com es gratuito y confiable, pero a veces puede tener demoras.</small>
+                <small>Nota: CNN e Infobae usan feeds de Google News, que son más estables.</small>
             </div>`;
             return;
         }
         
-        let html = '<div class="portals-grid">';
+        let html = '<div class="stats">📡 ' + totalNews + ' noticias cargadas</div>';
+        html += '<div class="portals-grid">';
         
         for (let portal of PORTALS) {
             let articles = allNewsData[portal.name] || [];
             
-            // Aplicar filtro
             if (currentFilter !== "all") {
                 articles = articles.filter(a => a.category === currentFilter);
             }
-            
-            const countColor = articles.length > 0 ? "#28a745" : "#dc3545";
             
             html += `
                 <div class="portal-card">
                     <div class="portal-header">
                         ${portal.name}
-                        <span style="float: right; font-size: 0.8rem; font-weight: normal; color: ${countColor}">${articles.length}</span>
+                        <span style="float: right; font-size: 0.75rem; font-weight: normal; opacity: 0.9">${articles.length}</span>
                     </div>
                     <div class="news-list">
             `;
             
             if (articles.length === 0) {
-                html += `<div style="padding: 40px; text-align: center; color: #adb5bd;">
+                html += `<div style="padding: 40px; text-align: center; color: #94a3b8;">
                     📭 Sin noticias en esta categoría<br>
-                    <small style="font-size: 0.7rem;">Prueba con otro filtro</small>
+                    <small>Prueba con otro filtro</small>
                 </div>`;
             } else {
                 for (let art of articles) {
@@ -389,7 +453,7 @@
                             </a>
                             <div class="news-meta">
                                 <span class="category-badge">${catEmoji} ${catName}</span>
-                                ${fechaStr ? `<span style="color:#94a3b8;">🕒 ${fechaStr}</span>` : ''}
+                                ${fechaStr ? `<span>🕒 ${fechaStr}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -413,7 +477,6 @@
             .replace(/'/g, '&#39;');
     }
     
-    // Eventos de filtro
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -423,7 +486,6 @@
         });
     });
     
-    // Iniciar carga
     loadAllNews();
 </script>
 </body>
