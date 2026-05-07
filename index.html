@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregador de Noticias | Búsqueda en 4 portales</title>
+    <title>Buscador de Noticias | CNN · CBC · Infobae · La República</title>
     <style>
         * {
             margin: 0;
@@ -19,57 +19,57 @@
             max-width: 1500px;
             margin: 0 auto;
         }
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
         h1 {
-            font-size: 1.9rem;
+            text-align: center;
             color: #0f172a;
-            margin-bottom: 6px;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
         }
         .sub {
+            text-align: center;
             color: #475569;
+            margin-bottom: 25px;
             font-size: 0.9rem;
         }
         
-        /* ===== BARRA DE BÚSQUEDA GRANDE Y VISIBLE ===== */
-        .search-box {
-            background: #ffffff;
-            border-radius: 60px;
-            padding: 8px;
-            margin: 20px auto;
-            max-width: 700px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border: 2px solid #1e3a8a;
+        /* BÚSQUEDA DESTACADA */
+        .search-section {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 25px;
+            border-radius: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         }
-        .search-icon {
-            font-size: 1.4rem;
-            padding-left: 15px;
-            color: #1e3a8a;
+        .search-label {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+            font-size: 1rem;
+        }
+        .search-box {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .search-input {
             flex: 1;
-            padding: 16px 10px;
+            padding: 16px 20px;
             font-size: 1.1rem;
             border: none;
+            border-radius: 60px;
             outline: none;
-            background: white;
             font-weight: 500;
+            min-width: 200px;
         }
-        .search-input::placeholder {
-            color: #94a3b8;
-            font-size: 1rem;
-            font-weight: normal;
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
         }
         .search-btn {
-            background: #1e3a8a;
+            background: #f59e0b;
             border: none;
-            border-radius: 50px;
-            padding: 12px 28px;
+            border-radius: 60px;
+            padding: 0 32px;
             color: white;
             font-weight: bold;
             font-size: 1rem;
@@ -77,57 +77,54 @@
             transition: all 0.2s;
         }
         .search-btn:hover {
-            background: #0f2b3d;
+            background: #d97706;
             transform: scale(1.02);
         }
-        .clear-btn {
-            background: #e2e8f0;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 20px;
-            color: #475569;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.9rem;
+        .search-examples {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
-        .clear-btn:hover {
-            background: #cbd5e1;
-            color: #dc2626;
+        .example-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .example-tag:hover {
+            background: rgba(255,255,255,0.4);
         }
         
-        .active-search {
-            text-align: center;
-            margin: 10px auto;
-            padding: 10px 20px;
+        .search-info {
             background: #dbeafe;
-            border-radius: 50px;
-            display: inline-block;
-            width: auto;
+            padding: 12px 20px;
+            border-radius: 60px;
+            text-align: center;
+            margin: 15px 0;
             font-weight: 500;
             color: #1e3a8a;
-        }
-        .search-results-info {
-            text-align: center;
-            margin: 10px 0;
-            font-size: 0.85rem;
-            color: #475569;
         }
         
         .stats-bar {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             margin: 15px 0;
             flex-wrap: wrap;
-            font-size: 0.8rem;
         }
         .stat-badge {
             background: white;
             padding: 6px 16px;
             border-radius: 30px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            font-size: 0.8rem;
             font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
+        
         .filters {
             display: flex;
             justify-content: center;
@@ -142,25 +139,21 @@
             background: white;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             border: 1px solid #e2e8f0;
         }
         .filter-btn.active {
             background: #1e3a8a;
             color: white;
         }
-        .filter-btn:hover:not(.active) {
-            background: #e2e8f0;
-        }
+        
         .portals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 24px;
         }
         .portal-card {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
@@ -169,7 +162,7 @@
             color: white;
             padding: 14px 18px;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             justify-content: space-between;
         }
@@ -177,14 +170,14 @@
             background: rgba(255,255,255,0.2);
             padding: 3px 12px;
             border-radius: 30px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
         .news-list {
             max-height: 550px;
             overflow-y: auto;
         }
         .news-item {
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid #edf2f7;
         }
         .news-item:hover {
@@ -195,7 +188,7 @@
             color: #0f172a;
             font-weight: 600;
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             line-height: 1.4;
             font-size: 0.9rem;
         }
@@ -208,10 +201,11 @@
             justify-content: space-between;
             align-items: center;
             font-size: 0.65rem;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .category-badge {
-            display: inline-block;
-            padding: 2px 10px;
+            padding: 3px 10px;
             border-radius: 20px;
             font-size: 0.6rem;
             font-weight: 600;
@@ -220,7 +214,8 @@
         .cat-economia { background: #dcfce7; color: #166534; }
         .cat-tecnologia { background: #e0f2fe; color: #075985; }
         .cat-general { background: #f1f5f9; color: #475569; }
-        .loading {
+        
+        .loading, .error-msg {
             text-align: center;
             padding: 60px;
             color: #475569;
@@ -236,7 +231,6 @@
             padding: 20px;
             color: #94a3b8;
             font-size: 0.7rem;
-            border-top: 1px solid #e2e8f0;
         }
         .refresh-btn {
             display: block;
@@ -251,37 +245,45 @@
         .search-highlight {
             background: #fde047;
             padding: 0 2px;
-            border-radius: 4px;
+            border-radius: 3px;
             font-weight: bold;
         }
         @media (max-width: 700px) {
-            .search-box { flex-wrap: wrap; border-radius: 30px; }
-            .search-btn, .clear-btn { flex: 1; }
-            .search-icon { display: none; }
+            .search-section { padding: 15px; }
+            .search-btn { padding: 12px 20px; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <header>
-        <h1>📰 Panorama de Noticias</h1>
-        <div class="sub">CNN Español · CBC Canada · Infobae · La República Colombia</div>
-    </header>
+    <h1>📰 Buscador de Noticias</h1>
+    <div class="sub">CNN Español · CBC Canada · Infobae · La República Colombia</div>
     
-    <!-- ===== CAJA DE BÚSQUEDA - MUY VISIBLE ===== -->
-    <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" id="searchInput" 
-               placeholder="Ejemplos: IA | Bitcoin |Futbol| Cambio climático | Petróleo | NASA " 
-               autocomplete="off">
-        <button class="clear-btn" id="clearSearchBtn">✕ Limpiar</button>
-        <button class="search-btn" id="searchBtn">Buscar</button>
+    <!-- ÁREA DE BÚSQUEDA PRINCIPAL -->
+    <div class="search-section">
+        <div class="search-label">🔍 ¿Qué quieres buscar hoy?</div>
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" 
+                   placeholder="Ej: Inteligencia Artificial, Bitcoin, Cambio climático, Milei..." 
+                   autocomplete="off">
+            <button class="search-btn" id="searchBtn">Buscar</button>
+        </div>
+        <div class="search-examples">
+            <span class="example-tag" data-example="Inteligencia Artificial">🤖 IA</span>
+            <span class="example-tag" data-example="Bitcoin">💰 Bitcoin</span>
+            <span class="example-tag" data-example="Milei">🇦🇷 Milei</span>
+            <span class="example-tag" data-example="Cambio climático">🌍 Cambio climático</span>
+            <span class="example-tag" data-example="Petróleo">🛢️ Petróleo</span>
+            <span class="example-tag" data-example="Gaza">🇵🇸 Gaza</span>
+            <span class="example-tag" data-example="Tesla">🚗 Tesla</span>
+            <span class="example-tag" data-example="Inflación">📈 Inflación</span>
+        </div>
     </div>
     
-    <div id="searchStatus" class="search-results-info"></div>
+    <div id="searchInfo" class="search-info" style="display: none;"></div>
     
     <div class="stats-bar" id="statsBar">
-        <span class="stat-badge">📊 Cargando...</span>
+        <span class="stat-badge">📊 Escribe un tema y presiona Buscar</span>
     </div>
     
     <div class="filters">
@@ -292,93 +294,118 @@
     </div>
     
     <div id="portalsContainer">
-        <div class="loading">🔄 Cargando noticias de los 4 portales...<br><small>CNN · CBC · Infobae · La República</small></div>
+        <div class="loading">🔍 Escribe cualquier tema arriba y presiona BUSCAR<br><small>Ej: IA, Bitcoin, Milei, Cambio climático...</small></div>
     </div>
     
-    <button class="refresh-btn" onclick="location.reload()">⟳ Actualizar noticias</button>
-    <footer>✏️ Escribe cualquier tema en la caja AZUL con 🔍 y presiona BUSCAR | Los resultados se resaltan en AMARILLO</footer>
+    <footer>🌐 La búsqueda consulta Google News para encontrar noticias de los 4 portales sobre el tema que elijas | Resultados en tiempo real</footer>
 </div>
 
 <script>
     let currentFilter = "all";
     let currentSearchTerm = "";
-    let allNewsData = {};
-    let categoryCounts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
-
-    const PORTALS = [
-        { name: "CNN Español", feeds: [
-            "https://news.google.com/rss/search?q=CNN+en+Español+noticias&hl=es-419&gl=US&ceid=US:es-419",
-            "https://news.google.com/rss/search?q=CNN+economía+América+Latina&hl=es-419&gl=US&ceid=US:es-419"
-        ]},
-        { name: "CBC News", feeds: [
-            "https://www.cbc.ca/cmlink/rss-topstories",
-            "https://www.cbc.ca/cmlink/rss-politics"
-        ]},
-        { name: "Infobae", feeds: [
-            "https://news.google.com/rss/search?q=Infobae+Argentina+noticias&hl=es-419&gl=AR&ceid=AR:es-419",
-            "https://news.google.com/rss/search?q=Infobae+economía&hl=es-419&gl=AR&ceid=AR:es-419"
-        ]},
-        { name: "La República", feeds: [
-            "https://www.larepublica.co/rss/economia",
-            "https://www.larepublica.co/rss/tecnologia"
-        ]}
-    ];
-
-    const KEYWORDS = {
-        politica: { es: ["política","gobierno","presidente","congreso","elección","ley","voto","milei","petro","biden","trump"], en: ["politics","government","president","election","law"] },
-        economia: { es: ["economía","dólar","inflación","mercado","banco","empresa","inversión","pib","petróleo","bitcoin","cripto","fintech"], en: ["economy","dollar","inflation","market","bank","bitcoin"] },
-        tecnologia: { es: ["tecnología","software","app","internet","ia","inteligencia artificial","robot","apple","google","microsoft","startup","bitcoin","blockchain"], en: ["technology","tech","ai","software","app","internet","robot"] }
+    let currentResults = {
+        "CNN Español": [],
+        "CBC News": [],
+        "Infobae": [],
+        "La República": []
     };
-
-    async function fetchRSSAsJSON(rssUrl) {
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+    let isLoading = false;
+    
+    // Mapeo de portales a sus dominios para búsqueda en Google News
+    const PORTAL_DOMAINS = {
+        "CNN Español": "site:cnnespanol.cnn.com OR site:cnn.com",
+        "CBC News": "site:cbc.ca",
+        "Infobae": "site:infobae.com",
+        "La República": "site:larepublica.co"
+    };
+    
+    // Para detectar categoría después de obtener resultados
+    const KEYWORDS = {
+        politica: {
+            es: ["política","gobierno","presidente","congreso","elección","ley","voto","milei","petro","biden","trump","senado","ministro"],
+            en: ["politics","government","president","election","law","congress","senate"]
+        },
+        economia: {
+            es: ["economía","dólar","inflación","mercado","banco","empresa","inversión","pib","petróleo","bitcoin","cripto","fintech","bolsa","acciones"],
+            en: ["economy","dollar","inflation","market","bank","bitcoin","stock","trade"]
+        },
+        tecnologia: {
+            es: ["tecnología","software","app","internet","ia","inteligencia artificial","robot","apple","google","microsoft","startup","blockchain","digital"],
+            en: ["technology","tech","ai","software","app","internet","robot","digital"]
+        }
+    };
+    
+    // Buscar noticias para un portal específico y un término
+    async function searchPortalNews(portalName, searchTerm) {
+        const domainQuery = PORTAL_DOMAINS[portalName];
+        // Construir consulta para Google News RSS
+        const query = `${searchTerm} ${domainQuery}`;
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=es-419&gl=US&ceid=US:es-419`;
+        
         try {
-            const res = await fetch(apiUrl);
-            const data = await res.json();
-            return data.status === "ok" ? data.items : [];
-        } catch(e) { return []; }
+            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            
+            if (data.status === "ok" && data.items && data.items.length > 0) {
+                return data.items.slice(0, 20).map(item => ({
+                    title: item.title.replace(/\s+[-|]\s+[A-Za-z0-9\s]+$/, '').trim(),
+                    link: item.link,
+                    pubDate: item.pubDate,
+                    description: item.description?.replace(/<[^>]*>/g, '') || "",
+                }));
+            }
+            return [];
+        } catch (error) {
+            console.error(`Error buscando en ${portalName}:`, error);
+            return [];
+        }
     }
-
-    function detectCategory(title, desc) {
-        const text = (title + " " + desc).toLowerCase();
+    
+    // Detectar categoría de una noticia
+    function detectCategory(title, description) {
+        const text = (title + " " + description).toLowerCase();
         let scores = { politica: 0, economia: 0, tecnologia: 0 };
-        for (let cat of ["politica","economia","tecnologia"]) {
-            for (let lang of ["es","en"]) {
+        
+        for (let cat of ["politica", "economia", "tecnologia"]) {
+            for (let lang of ["es", "en"]) {
                 if (KEYWORDS[cat][lang]) {
                     for (let kw of KEYWORDS[cat][lang]) {
-                        if (text.includes(kw)) scores[cat] += 2;
-                        if (title.toLowerCase().includes(kw)) scores[cat] += 1;
+                        if (text.includes(kw.toLowerCase())) {
+                            scores[cat] += 2;
+                            if (title.toLowerCase().includes(kw.toLowerCase())) scores[cat] += 1;
+                        }
                     }
                 }
             }
         }
-        let best = "general", bestScore = 2;
-        for (let cat in scores) if (scores[cat] > bestScore) { bestScore = scores[cat]; best = cat; }
+        
+        let best = "general";
+        let bestScore = 2;
+        for (let cat in scores) {
+            if (scores[cat] > bestScore) {
+                bestScore = scores[cat];
+                best = cat;
+            }
+        }
         return best;
     }
-
-    function cleanTitle(title) {
-        return title.replace(/\s+[-|]\s+[A-Za-z0-9\s]+$/, '').trim();
-    }
-
+    
+    // Formatear fecha
     function formatDate(dateStr) {
         try {
             const d = new Date(dateStr);
-            if (isNaN(d)) return "";
+            if (isNaN(d.getTime())) return "";
             const diff = Math.floor((new Date() - d) / 60000);
+            if (diff < 1) return "ahora";
             if (diff < 60) return `hace ${diff} min`;
             if (diff < 1440) return `hace ${Math.floor(diff/60)} h`;
             if (diff < 10080) return `hace ${Math.floor(diff/1440)} d`;
             return d.toLocaleDateString("es-ES");
         } catch(e) { return ""; }
     }
-
-    function matchesSearch(article, term) {
-        if (!term) return true;
-        const t = term.toLowerCase();
-        return article.title.toLowerCase().includes(t) || article.description.toLowerCase().includes(t);
-    }
-
+    
+    // Resaltar texto
     function highlightText(text, term) {
         if (!term) return text;
         try {
@@ -386,42 +413,65 @@
             return text.replace(regex, `<span class="search-highlight">$1</span>`);
         } catch(e) { return text; }
     }
-
-    async function loadAllNews() {
-        document.getElementById("portalsContainer").innerHTML = '<div class="loading">🔄 Cargando noticias...</div>';
-        let results = {};
-        for (let portal of PORTALS) {
-            let items = [];
-            for (let feed of portal.feeds) {
-                let data = await fetchRSSAsJSON(feed);
-                if (data) items = items.concat(data);
-            }
-            let unique = [];
-            let seen = new Set();
-            for (let i of items) {
-                let key = i.title.substring(0,80);
-                if (!seen.has(key)) { seen.add(key); unique.push(i); }
-            }
-            results[portal.name] = unique.slice(0, 30).map(i => ({
-                title: cleanTitle(i.title),
-                link: i.link,
-                pubDate: i.pubDate,
-                description: i.description?.replace(/<[^>]*>/g,'') || "",
-                category: detectCategory(i.title, i.description || "")
-            }));
+    
+    // Buscar en todos los portales
+    async function searchAllPortals(searchTerm) {
+        if (!searchTerm || searchTerm.trim() === "") {
+            alert("Por favor, escribe un tema para buscar");
+            return;
         }
-        allNewsData = results;
+        
+        isLoading = true;
+        const container = document.getElementById("portalsContainer");
+        container.innerHTML = '<div class="loading">🔍 Buscando "<strong>' + escapeHtml(searchTerm) + '</strong>" en los 4 portales...<br><small>Esto puede tomar 5-10 segundos</small></div>';
+        
+        document.getElementById("searchInfo").style.display = "block";
+        document.getElementById("searchInfo").innerHTML = `🔎 Buscando: <strong>"${escapeHtml(searchTerm)}"</strong> - Consultando CNN, CBC, Infobae y La República...`;
+        
+        const results = {
+            "CNN Español": [],
+            "CBC News": [],
+            "Infobae": [],
+            "La República": []
+        };
+        
+        // Buscar en paralelo
+        const promises = Object.keys(PORTAL_DOMAINS).map(async (portalName) => {
+            const news = await searchPortalNews(portalName, searchTerm);
+            results[portalName] = news.map(n => ({
+                ...n,
+                category: detectCategory(n.title, n.description)
+            }));
+            console.log(`✅ ${portalName}: ${news.length} noticias encontradas`);
+        });
+        
+        await Promise.all(promises);
+        
+        currentResults = results;
+        currentSearchTerm = searchTerm;
+        isLoading = false;
+        
+        document.getElementById("searchInfo").innerHTML = `🔎 Resultados para: <strong>"${escapeHtml(searchTerm)}"</strong> | Total: ${getTotalResultsCount()} noticias encontradas`;
+        
         updateStatsAndRender();
     }
-
+    
+    function getTotalResultsCount() {
+        let total = 0;
+        for (let portal in currentResults) {
+            total += currentResults[portal].length;
+        }
+        return total;
+    }
+    
     function updateStatsAndRender() {
-        let counts = { politica:0, economia:0, tecnologia:0, general:0 };
-        for (let p in allNewsData) {
-            for (let a of allNewsData[p]) {
-                if (matchesSearch(a, currentSearchTerm)) counts[a.category]++;
+        let counts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
+        for (let portal in currentResults) {
+            for (let article of currentResults[portal]) {
+                counts[article.category]++;
             }
         }
-        categoryCounts = counts;
+        
         document.getElementById("statsBar").innerHTML = `
             <span class="stat-badge">📰 Total: ${counts.politica+counts.economia+counts.tecnologia+counts.general}</span>
             <span class="stat-badge">🏛️ Política: ${counts.politica}</span>
@@ -431,54 +481,85 @@
         `;
         render();
     }
-
+    
     function render() {
         const container = document.getElementById("portalsContainer");
+        
+        let hasResults = false;
+        for (let portal in currentResults) {
+            if (currentResults[portal].length > 0) hasResults = true;
+        }
+        
+        if (!hasResults && currentSearchTerm) {
+            container.innerHTML = `<div class="no-results">
+                😕 No se encontraron noticias sobre "${escapeHtml(currentSearchTerm)}"<br><br>
+                <strong>Sugerencias:</strong><br>
+                • Intenta con palabras más cortas o generales (ej: "clima" en vez de "cambio climático")<br>
+                • Prueba con otro término<br>
+                • Los portales pueden no tener noticias recientes sobre este tema
+            </div>`;
+            return;
+        }
+        
+        if (!hasResults && !currentSearchTerm) {
+            container.innerHTML = '<div class="loading">🔍 Escribe cualquier tema arriba y presiona BUSCAR<br><small>Ej: IA, Bitcoin, Milei, Cambio climático...</small></div>';
+            return;
+        }
+        
         let html = '<div class="portals-grid">';
-        for (let portalName in allNewsData) {
-            let articles = allNewsData[portalName].filter(a => matchesSearch(a, currentSearchTerm));
-            if (currentFilter !== "all") articles = articles.filter(a => a.category === currentFilter);
-            html += `<div class="portal-card"><div class="portal-header">${portalName}<span class="portal-count">${articles.length}</span></div><div class="news-list">`;
+        
+        for (let portalName in currentResults) {
+            let articles = [...currentResults[portalName]];
+            
+            // Aplicar filtro de categoría
+            if (currentFilter !== "all") {
+                articles = articles.filter(a => a.category === currentFilter);
+            }
+            
+            html += `
+                <div class="portal-card">
+                    <div class="portal-header">
+                        ${portalName}
+                        <span class="portal-count">${articles.length}</span>
+                    </div>
+                    <div class="news-list">
+            `;
+            
             if (articles.length === 0) {
-                html += `<div class="no-results">📭 ${currentSearchTerm ? `Sin resultados para "${currentSearchTerm}"` : "Sin noticias"}</div>`;
+                html += `<div class="no-results">📭 Sin resultados para "${escapeHtml(currentSearchTerm)}"</div>`;
             } else {
-                for (let a of articles) {
-                    let catClass = `cat-${a.category}`;
-                    let catName = { politica:"Política", economia:"Economía", tecnologia:"Tecnología", general:"General" }[a.category];
-                    let catEmoji = { politica:"🏛️", economia:"📊", tecnologia:"💻", general:"📰" }[a.category];
-                    html += `<div class="news-item">
-                        <a href="${a.link}" target="_blank" class="news-title">${highlightText(a.title, currentSearchTerm)}</a>
-                        <div class="news-meta">
-                            <span class="category-badge ${catClass}">${catEmoji} ${catName}</span>
-                            <span>🕒 ${formatDate(a.pubDate)}</span>
+                for (let art of articles) {
+                    let catClass = `cat-${art.category}`;
+                    let catName = { politica:"Política", economia:"Economía", tecnologia:"Tecnología", general:"General" }[art.category];
+                    let catEmoji = { politica:"🏛️", economia:"📊", tecnologia:"💻", general:"📰" }[art.category];
+                    
+                    html += `
+                        <div class="news-item">
+                            <a href="${art.link}" target="_blank" class="news-title">
+                                ${highlightText(art.title, currentSearchTerm)}
+                            </a>
+                            <div class="news-meta">
+                                <span class="category-badge ${catClass}">${catEmoji} ${catName}</span>
+                                <span>🕒 ${formatDate(art.pubDate)}</span>
+                            </div>
                         </div>
-                    </div>`;
+                    `;
                 }
             }
+            
             html += `</div></div>`;
         }
+        
         html += '</div>';
         container.innerHTML = html;
     }
-
-    function performSearch() {
-        currentSearchTerm = document.getElementById("searchInput").value.trim();
-        const statusDiv = document.getElementById("searchStatus");
-        if (currentSearchTerm) {
-            statusDiv.innerHTML = `<div class="active-search">🔎 Mostrando resultados para: <strong>"${currentSearchTerm}"</strong> ✨</div>`;
-        } else {
-            statusDiv.innerHTML = "";
-        }
-        updateStatsAndRender();
+    
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
-
-    function clearSearch() {
-        document.getElementById("searchInput").value = "";
-        currentSearchTerm = "";
-        document.getElementById("searchStatus").innerHTML = "";
-        updateStatsAndRender();
-    }
-
+    
+    // Eventos
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -487,12 +568,27 @@
             render();
         });
     });
-
-    document.getElementById("searchBtn").addEventListener("click", performSearch);
-    document.getElementById("clearSearchBtn").addEventListener("click", clearSearch);
-    document.getElementById("searchInput").addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(); });
     
-    loadAllNews();
+    document.getElementById("searchBtn").addEventListener("click", () => {
+        const term = document.getElementById("searchInput").value.trim();
+        if (term) searchAllPortals(term);
+        else alert("Escribe un tema para buscar");
+    });
+    
+    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            const term = document.getElementById("searchInput").value.trim();
+            if (term) searchAllPortals(term);
+        }
+    });
+    
+    document.querySelectorAll(".example-tag").forEach(tag => {
+        tag.addEventListener("click", () => {
+            const example = tag.dataset.example;
+            document.getElementById("searchInput").value = example;
+            searchAllPortals(example);
+        });
+    });
 </script>
 </body>
 </html>
