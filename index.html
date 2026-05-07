@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Buscador de Noticias | Búsqueda desde cero por tema + categoría</title>
+    <title>Agregador de Noticias | 4 Portales · Buscador · +100 Noticias</title>
     <style>
         * {
             margin: 0;
@@ -21,100 +21,91 @@
         }
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             color: #0f172a;
+            margin-bottom: 6px;
         }
         .sub {
             color: #475569;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
-        
-        /* Hero de búsqueda */
-        .search-hero {
-            background: linear-gradient(135deg, #0f2b3d 0%, #1e3a8a 100%);
-            border-radius: 28px;
-            padding: 25px;
-            margin-bottom: 25px;
-            text-align: center;
-            color: white;
-        }
-        .search-hero h3 {
-            margin-bottom: 12px;
-            font-size: 1.3rem;
-        }
-        .search-box {
-            display: flex;
-            gap: 10px;
-            max-width: 650px;
-            margin: 0 auto;
-            background: white;
-            padding: 6px 12px;
-            border-radius: 50px;
-        }
-        .search-box input {
-            flex: 1;
-            padding: 12px 10px;
-            border: none;
-            outline: none;
-            font-size: 0.95rem;
-            border-radius: 40px;
-            background: transparent;
-        }
-        .search-box button {
-            background: #0f2b3d;
-            border: none;
-            color: white;
-            padding: 8px 24px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .search-box button:hover {
-            background: #3b82f6;
-        }
-        .search-status {
-            margin-top: 12px;
-            font-size: 0.75rem;
-            opacity: 0.9;
-        }
-        
-        /* Stats */
         .stats-bar {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 20px;
             margin: 15px 0;
             flex-wrap: wrap;
+            font-size: 0.8rem;
         }
         .stat-badge {
             background: white;
-            padding: 4px 14px;
+            padding: 5px 15px;
             border-radius: 30px;
-            font-size: 0.75rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        
-        /* Filtros de categoría - AHORA CAMBIAN LA BÚSQUEDA */
+        .search-section {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: 1px solid #cbd5e1;
+            width: 280px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30,58,138,0.2);
+        }
+        .search-btn, .clear-btn {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: white;
+            border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
+        }
+        .search-btn {
+            background: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+        .search-btn:hover {
+            background: #0f2b3d;
+        }
+        .clear-btn:hover {
+            background: #e2e8f0;
+        }
         .filters {
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
         .filter-btn {
-            padding: 8px 24px;
+            padding: 8px 28px;
             border: none;
             border-radius: 40px;
             background: white;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             border: 1px solid #e2e8f0;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         .filter-btn.active {
             background: #1e3a8a;
@@ -123,44 +114,56 @@
         }
         .filter-btn:hover:not(.active) {
             background: #e2e8f0;
+            transform: scale(1.02);
         }
-        
-        /* Grid de portales */
+        .result-indicator {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
         .portals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
         }
         .portal-card {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
             height: fit-content;
+        }
+        .portal-card:hover {
+            transform: translateY(-3px);
         }
         .portal-header {
             background: linear-gradient(135deg, #0f2b3d 0%, #1e3a8a 100%);
             color: white;
-            padding: 14px 18px;
+            padding: 16px 20px;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .portal-count {
             background: rgba(255,255,255,0.2);
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
+            font-weight: normal;
         }
         .news-list {
-            max-height: 550px;
+            max-height: 600px;
             overflow-y: auto;
         }
         .news-item {
-            padding: 12px 16px;
+            padding: 14px 18px;
             border-bottom: 1px solid #edf2f7;
+            transition: background 0.15s;
         }
         .news-item:hover {
             background: #fafcff;
@@ -170,9 +173,9 @@
             color: #0f172a;
             font-weight: 600;
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             line-height: 1.4;
-            font-size: 0.88rem;
+            font-size: 0.92rem;
         }
         .news-title:hover {
             color: #1e3a8a;
@@ -183,263 +186,290 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 6px;
-            font-size: 0.65rem;
+            gap: 8px;
+            font-size: 0.7rem;
         }
-        .source-badge {
-            background: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            color: #475569;
-        }
-        .loading, .no-results, .empty-state {
-            text-align: center;
-            padding: 50px;
-            background: white;
-            border-radius: 24px;
-            color: #64748b;
-        }
-        .spinner {
+        .category-badge {
             display: inline-block;
-            width: 35px;
-            height: 35px;
-            border: 3px solid #e2e8f0;
-            border-top-color: #1e3a8a;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .search-highlight {
-            background-color: #fef08a;
-            padding: 0 2px;
-            border-radius: 3px;
+        .cat-politica { background: #fee2e2; color: #991b1b; }
+        .cat-economia { background: #dcfce7; color: #166534; }
+        .cat-tecnologia { background: #e0f2fe; color: #075985; }
+        .cat-general { background: #f1f5f9; color: #475569; }
+        .loading, .error-msg, .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #475569;
         }
         footer {
             text-align: center;
-            margin-top: 35px;
-            padding: 18px;
+            margin-top: 40px;
+            padding: 20px;
             color: #94a3b8;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             border-top: 1px solid #e2e8f0;
+        }
+        .refresh-btn {
+            display: block;
+            margin: 25px auto 0;
+            padding: 10px 28px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .refresh-btn:hover {
+            background: #0f2b3d;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
         }
         @media (max-width: 780px) {
             body { padding: 12px; }
             .portals-grid { grid-template-columns: 1fr; }
-            .search-box { flex-wrap: wrap; border-radius: 20px; padding: 10px; }
-            .search-box button { width: 100%; }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <h1>🔍 Buscador de Noticias por Tema</h1>
-        <div class="sub">CNN · Infobae · CBC · La República</div>
+        <h1>📰 Panorama de Noticias</h1>
+        <div class="sub">CNN Español · CBC Canada · Infobae · La República Colombia</div>
     </header>
     
-    <div class="search-hero">
-        <h3>📰 ¿Qué quieres buscar?</h3>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Ej: inflación, inteligencia artificial, Bitcoin, cambio climático..." autocomplete="off">
-            <button id="searchBtn">🔍 Buscar desde cero</button>
-        </div>
-        <div class="search-status" id="searchStatus">
-            💡 Los filtros de categoría CAMBIAN la búsqueda (ej: "CNN política + tema")
-        </div>
+    <div class="stats-bar" id="statsBar">
+        <span class="stat-badge">📊 Cargando...</span>
     </div>
     
-    <div class="stats-bar" id="statsBar">
-        <span class="stat-badge">📊 Esperando búsqueda...</span>
+    <!-- Buscador -->
+    <div class="search-section">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar noticias (ej: inteligencia artificial, petróleo...)" autocomplete="off">
+        <button id="searchBtn" class="search-btn">🔍 Buscar</button>
+        <button id="clearSearchBtn" class="clear-btn">✖️ Limpiar</button>
     </div>
+    <div id="resultIndicator" class="result-indicator"></div>
     
     <div class="filters">
-        <button class="filter-btn active" data-filter="all">🌐 Todas las categorías</button>
+        <button class="filter-btn active" data-filter="all">🌐 Todas</button>
         <button class="filter-btn" data-filter="politica">🏛️ Política</button>
         <button class="filter-btn" data-filter="economia">📊 Economía</button>
         <button class="filter-btn" data-filter="tecnologia">💻 Tecnología</button>
     </div>
     
     <div id="portalsContainer">
-        <div class="empty-state">
-            <span style="font-size: 2rem;">🔍</span><br><br>
-            <strong>Busca cualquier tema desde cero</strong><br>
-            <small>Ejemplo: "inteligencia artificial" + filtro "Tecnología"</small>
-        </div>
+        <div class="loading">🔄 Cargando hasta 40 noticias por portal con filtros mejorados...<br><small>Fuentes específicas de política, economía y tecnología</small></div>
     </div>
     
-    <footer>🔍 Cada búsqueda es NUEVA | Los filtros CAMBIAN la URL de búsqueda | CNN · Infobae · CBC · La República buscan tu tema específico</footer>
+    <button class="refresh-btn" onclick="location.reload()">⟳ Actualizar todas las noticias</button>
+    <footer>Fuentes: RSS + Google News | Filtros mejorados con +200 palabras clave | Cada portal hasta 40 noticias</footer>
 </div>
 
 <script>
-    // Estado actual
-    let currentCategory = "all";      // all, politica, economia, tecnologia
-    let currentTopic = "";            // tema que escribe el usuario
-    let isLoading = false;
-    let resultsData = {};              // { "CNN Español": [...], "Infobae": [...], etc }
-    
-    // Configuración de portales con lógica de búsqueda por categoría
+    let currentFilter = "all";
+    let currentSearchTerm = "";
+    let allNewsData = {};
+    let categoryCounts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
+
+    // ========== PORTALES CON MÚLTIPLES FEEDS ESPECÍFICOS POR CATEGORÍA ==========
+    // Se agregaron feeds de búsqueda para mejorar cantidad de noticias de política, economía y tecnología
     const PORTALS = [
-        {
-            name: "CNN Español",
-            buildSearchUrl: (topic, category) => {
-                let searchTerm = `CNN+en+Español+${encodeURIComponent(topic)}`;
-                if (category === "politica") searchTerm = `CNN+política+${encodeURIComponent(topic)}+noticias`;
-                else if (category === "economia") searchTerm = `CNN+economía+${encodeURIComponent(topic)}+noticias`;
-                else if (category === "tecnologia") searchTerm = `CNN+tecnología+${encodeURIComponent(topic)}+noticias`;
-                else searchTerm = `CNN+${encodeURIComponent(topic)}+noticias`;
-                return `https://news.google.com/rss/search?q=${searchTerm}&hl=es-419&gl=US&ceid=US:es-419`;
-            },
-            sourceName: "CNN"
+        { 
+            name: "CNN Español", 
+            feeds: [
+                // Originales
+                "https://news.google.com/rss/search?q=CNN+en+Español+noticias&hl=es-419&gl=US&ceid=US:es-419",
+                "https://news.google.com/rss/search?q=CNN+economía+América+Latina&hl=es-419&gl=US&ceid=US:es-419",
+                // Nuevos feeds específicos por categoría
+                "https://news.google.com/rss/search?q=CNN+política+internacional&hl=es-419&gl=US&ceid=US:es-419",
+                "https://news.google.com/rss/search?q=CNN+tecnología+innovación&hl=es-419&gl=US&ceid=US:es-419",
+                "https://news.google.com/rss/search?q=CNN+Latinoamérica+elecciones&hl=es-419&gl=US&ceid=US:es-419"
+            ],
+            lang: "es"
         },
-        {
-            name: "Infobae",
-            buildSearchUrl: (topic, category) => {
-                let searchTerm = `Infobae+${encodeURIComponent(topic)}`;
-                if (category === "politica") searchTerm = `Infobae+política+${encodeURIComponent(topic)}+Argentina`;
-                else if (category === "economia") searchTerm = `Infobae+economía+${encodeURIComponent(topic)}+Argentina`;
-                else if (category === "tecnologia") searchTerm = `Infobae+tecnología+${encodeURIComponent(topic)}`;
-                else searchTerm = `Infobae+${encodeURIComponent(topic)}+noticias`;
-                return `https://news.google.com/rss/search?q=${searchTerm}&hl=es-419&gl=AR&ceid=AR:es-419`;
-            },
-            sourceName: "Infobae"
+        { 
+            name: "CBC News", 
+            feeds: [
+                "https://www.cbc.ca/cmlink/rss-topstories",
+                "https://www.cbc.ca/cmlink/rss-politics",
+                "https://www.cbc.ca/cmlink/rss-business",
+                // Feeds de tecnología y economía avanzada (usando Google News para CBC)
+                "https://news.google.com/rss/search?q=CBC+technology+news&hl=en-CA&gl=CA&ceid=CA:en",
+                "https://news.google.com/rss/search?q=CBC+economy+Canada&hl=en-CA&gl=CA&ceid=CA:en",
+                "https://news.google.com/rss/search?q=CBC+politics+Canada&hl=en-CA&gl=CA&ceid=CA:en"
+            ],
+            lang: "en"
         },
-        {
-            name: "CBC News",
-            buildSearchUrl: (topic, category) => {
-                let searchTerm = `CBC+News+${encodeURIComponent(topic)}+Canada`;
-                if (category === "politica") searchTerm = `CBC+politics+${encodeURIComponent(topic)}+Canada`;
-                else if (category === "economia") searchTerm = `CBC+business+economy+${encodeURIComponent(topic)}+Canada`;
-                else if (category === "tecnologia") searchTerm = `CBC+technology+${encodeURIComponent(topic)}+Canada`;
-                else searchTerm = `CBC+${encodeURIComponent(topic)}+Canada`;
-                return `https://news.google.com/rss/search?q=${searchTerm}&hl=en-CA&gl=CA&ceid=CA:en`;
-            },
-            sourceName: "CBC"
+        { 
+            name: "Infobae", 
+            feeds: [
+                "https://news.google.com/rss/search?q=Infobae+Argentina+noticias&hl=es-419&gl=AR&ceid=AR:es-419",
+                "https://news.google.com/rss/search?q=Infobae+economía&hl=es-419&gl=AR&ceid=AR:es-419",
+                // Feeds específicos por categoría
+                "https://news.google.com/rss/search?q=Infobae+política+Argentina&hl=es-419&gl=AR&ceid=AR:es-419",
+                "https://news.google.com/rss/search?q=Infobae+tecnología+startups&hl=es-419&gl=AR&ceid=AR:es-419",
+                "https://news.google.com/rss/search?q=Infobae+Milei+economía&hl=es-419&gl=AR&ceid=AR:es-419"
+            ],
+            lang: "es"
         },
-        {
-            name: "La República",
-            buildSearchUrl: (topic, category) => {
-                let searchTerm = `La+República+${encodeURIComponent(topic)}+Colombia`;
-                if (category === "politica") searchTerm = `La+República+política+${encodeURIComponent(topic)}+Colombia`;
-                else if (category === "economia") searchTerm = `La+República+economía+${encodeURIComponent(topic)}+Colombia`;
-                else if (category === "tecnologia") searchTerm = `La+República+tecnología+${encodeURIComponent(topic)}+Colombia`;
-                else searchTerm = `La+República+${encodeURIComponent(topic)}+Colombia`;
-                return `https://news.google.com/rss/search?q=${searchTerm}&hl=es-419&gl=CO&ceid=CO:es-419`;
-            },
-            sourceName: "La República"
+        { 
+            name: "La República", 
+            feeds: [
+                "https://www.larepublica.co/rss/economia",
+                "https://www.larepublica.co/rss/tecnologia",
+                "https://www.larepublica.co/rss/empresas",
+                // Feed de política (no tiene RSS oficial, usamos Google News)
+                "https://news.google.com/rss/search?q=La+República+Colombia+política&hl=es-419&gl=CO&ceid=CO:es-419",
+                "https://news.google.com/rss/search?q=La+República+economía+colombiana&hl=es-419&gl=CO&ceid=CO:es-419",
+                "https://news.google.com/rss/search?q=La+República+tecnología+Colombia&hl=es-419&gl=CO&ceid=CO:es-419"
+            ],
+            lang: "es"
         }
     ];
-    
-    // Función para obtener noticias de una URL RSS
-    async function fetchNewsFromUrl(url, portalName) {
+
+    // ========== PALABRAS CLAVE EXTENDIDAS (más de 200 términos) ==========
+    const KEYWORDS = {
+        politica: {
+            es: [
+                "política", "gobierno", "presidente", "congreso", "senado", "elección", "ministro", "ley", "voto",
+                "cámara", "diputado", "poder", "estado", "nación", "político", "partido", "democracia", "elecciones",
+                "alcalde", "gobernador", "senador", "parlamento", "constitución", "reforma", "decreto", "oposición",
+                "crisis política", "gabinete", "legislativo", "ejecutivo", "judicial", "presidencial", "jefe de estado",
+                "trump", "biden", "milei", "petro", "boric", "lula", "amnistía", "impeachment", "referéndum",
+                "política exterior", "derechos humanos", "justicia", "fiscalía", "corrupción", "investigación",
+                "senado", "diputados", "asamblea", "vicepresidente", "canciller", "embajador", "tratado", "alianza",
+                "manifestación", "protesta", "leyes", "decretos", "presupuesto nacional", "bloque", "opositor",
+                "oficialismo", "coalición", "frente amplio", "macri", "bolsonaro", "sánchez", "sheinbaum"
+            ],
+            en: [
+                "politics", "government", "president", "congress", "senate", "election", "minister", "law", "vote",
+                "parliament", "prime minister", "cabinet", "political", "democracy", "governor", "senator",
+                "trump", "biden", "congressional", "supreme court", "legislation", "policy", "white house",
+                "conservative", "liberal", "democrat", "republican", "house of representatives", "federal"
+            ]
+        },
+        economia: {
+            es: [
+                "economía", "económico", "mercado", "empresa", "banco", "inversión", "dólar", "peso", "inflación",
+                "pib", "finanzas", "comercio", "exportación", "importación", "bursátil", "financiero", "acciones",
+                "bolsa", "divisas", "tasa de interés", "recesión", "crecimiento", "desempleo", "paro", "salario",
+                "precios", "petróleo", "gas", "energía", "crisis económica", "deuda", "fmi", "fondo monetario",
+                "banco central", "reservas", "tipo de cambio", "inflación interanual", "canasta básica", "pobreza",
+                "empresas", "startup", "negocios", "rentabilidad", "ganancias", "pérdidas", "quiebra", "fusiones",
+                "adquisiciones", "comercio exterior", "aranceles", "impuestos", "subsidios", "jubilación", "moneda",
+                "bitcoin", "cripto", "blockchain", "fintech", "crowdfunding", "seguro", "crédito", "hipoteca",
+                "ipc", "riesgo país", "swap", "bonos", "acciones", "dividendos", "revaluación", "devaluación",
+                "salario mínimo", "pensión", "jubilados", "inflación núcleo", "actividad económica", "comercio minorista"
+            ],
+            en: [
+                "economy", "economic", "market", "business", "bank", "investment", "dollar", "inflation", "gdp",
+                "finance", "trade", "stock", "shares", "interest rate", "recession", "growth", "unemployment",
+                "oil", "gas", "energy", "debt", "imf", "central bank", "currency", "bitcoin", "crypto", "fintech",
+                "earnings", "profit", "merger", "acquisition", "tax", "subsidy", "pension", "credit", "mortgage",
+                "federal reserve", "bond", "equity", "commodity", "retail sales", "housing market"
+            ]
+        },
+        tecnologia: {
+            es: [
+                "tecnología", "software", "app", "internet", "digital", "inteligencia artificial", "ia", "robot",
+                "innovación", "computación", "móvil", "apple", "google", "microsoft", "startup", "cibernética",
+                "computadora", "celular", "smartphone", "tablet", "redes sociales", "facebook", "twitter", "instagram",
+                "whatsapp", "tiktok", "youtube", "algoritmo", "datos", "big data", "cloud", "nube", "ciberseguridad",
+                "hacker", "virus", "malware", "5g", "wifi", "bluetooth", "realidad virtual", "metaverso", "nft",
+                "blockchain", "criptomoneda", "bitcoin", "ethereum", "programación", "código", "desarrollador",
+                "aplicación", "plataforma", "streaming", "netflix", "spotify", "amazon", "tesla", "spacex",
+                "chatgpt", "openai", "machine learning", "deep learning", "robótica", "automatización", "drone",
+                "impresión 3d", "biotecnología", "nanotecnología", "computación cuántica", "internet de las cosas",
+                "smart city", "asistente virtual", "siri", "alexa", "home assistant", "wearable", "realidad aumentada"
+            ],
+            en: [
+                "technology", "tech", "software", "app", "internet", "digital", "artificial intelligence", "ai",
+                "robot", "innovation", "computing", "mobile", "apple", "google", "microsoft", "startup", "cyber",
+                "smartphone", "social media", "facebook", "twitter", "instagram", "whatsapp", "tiktok", "youtube",
+                "algorithm", "data", "big data", "cloud", "cybersecurity", "hacker", "virus", "malware", "5g",
+                "virtual reality", "metaverse", "nft", "blockchain", "cryptocurrency", "bitcoin", "ethereum",
+                "coding", "developer", "streaming", "netflix", "spotify", "amazon", "tesla", "spacex",
+                "chatgpt", "openai", "machine learning", "deep learning", "robotics", "automation", "drone", "3d printing",
+                "biotech", "quantum computing", "internet of things", "smart home"
+            ]
+        }
+    };
+
+    async function fetchRSSAsJSON(rssUrl) {
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
         try {
-            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
-            const response = await fetch(proxyUrl);
+            const response = await fetch(apiUrl);
             const data = await response.json();
-            
-            if (data.status === "ok" && data.items && data.items.length > 0) {
-                // Procesar y limpiar noticias
-                const items = data.items.slice(0, 25).map(item => {
-                    let title = item.title || "";
-                    // Limpiar sufijos comunes
-                    title = title.replace(/\s+[-|]\s+[A-Za-z0-9\s]+$/g, '');
-                    title = title.replace(/\s+[-|]\s+[A-Za-z0-9\s]+\.?$/g, '');
-                    title = title.trim();
-                    
-                    return {
-                        title: title,
-                        link: item.link,
-                        pubDate: item.pubDate,
-                        description: item.description?.replace(/<[^>]*>/g, '') || "",
-                        source: portalName
-                    };
-                });
-                return items;
+            if (data.status === "ok") {
+                return data.items;
             }
             return [];
         } catch (error) {
-            console.error(`Error en ${portalName}:`, error);
+            console.error("Error en RSS:", error);
             return [];
         }
     }
-    
-    // Búsqueda en TODOS los portales con la categoría y tema actual
-    async function searchAllPortals() {
-        if (!currentTopic.trim()) {
-            alert("✏️ Escribe un tema para buscar (ej: inflación, tecnología, política)");
-            return false;
+
+    function detectCategory(title, description, lang) {
+        const text = (title + " " + description).toLowerCase();
+        let scores = { politica: 0, economia: 0, tecnologia: 0 };
+        
+        for (let cat of ["politica", "economia", "tecnologia"]) {
+            const palabras = KEYWORDS[cat];
+            for (let idioma of ["es", "en"]) {
+                if (palabras[idioma]) {
+                    for (let kw of palabras[idioma]) {
+                        if (text.includes(kw.toLowerCase())) {
+                            scores[cat] += 2;
+                            if (title.toLowerCase().includes(kw.toLowerCase())) {
+                                scores[cat] += 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
         
-        if (isLoading) return false;
+        let maxCat = "general";
+        let maxScore = 2;
         
-        isLoading = true;
-        
-        const container = document.getElementById("portalsContainer");
-        container.innerHTML = `
-            <div class="loading">
-                <div class="spinner"></div><br><br>
-                🔍 Buscando <strong>"${escapeHtml(currentTopic)}"</strong> en los 4 portales<br>
-                <small>Categoría: ${getCategoryName(currentCategory)} | Cada portal hace su propia búsqueda</small>
-            </div>
-        `;
-        
-        document.getElementById("searchStatus").innerHTML = `⏳ Buscando "${escapeHtml(currentTopic)}" en ${getCategoryName(currentCategory)}...`;
-        
-        // Construir URLs y buscar en paralelo
-        const searchPromises = PORTALS.map(portal => {
-            const url = portal.buildSearchUrl(currentTopic, currentCategory);
-            console.log(`🔍 ${portal.name}: ${url.substring(0, 100)}...`);
-            return fetchNewsFromUrl(url, portal.name);
-        });
-        
-        const allResults = await Promise.all(searchPromises);
-        
-        // Organizar resultados
-        resultsData = {};
-        PORTALS.forEach((portal, index) => {
-            resultsData[portal.name] = allResults[index] || [];
-            console.log(`✅ ${portal.name}: ${resultsData[portal.name].length} noticias`);
-        });
-        
-        isLoading = false;
-        
-        // Actualizar estadísticas y renderizar
-        updateStatsAndRender();
-        
-        const total = getTotalNewsCount();
-        if (total > 0) {
-            document.getElementById("searchStatus").innerHTML = `✅ ${total} noticias encontradas sobre "${escapeHtml(currentTopic)}" en ${getCategoryName(currentCategory)}`;
-        } else {
-            document.getElementById("searchStatus").innerHTML = `😕 No se encontraron noticias sobre "${escapeHtml(currentTopic)}" en ${getCategoryName(currentCategory)}. Prueba con otro tema.`;
+        for (let cat in scores) {
+            if (scores[cat] > maxScore) {
+                maxScore = scores[cat];
+                maxCat = cat;
+            }
         }
-        
-        return true;
+        return maxCat;
     }
-    
-    function getCategoryName(cat) {
-        if (cat === "politica") return "🏛️ Política";
-        if (cat === "economia") return "📊 Economía";
-        if (cat === "tecnologia") return "💻 Tecnología";
-        return "🌐 Todas las categorías";
-    }
-    
-    function getTotalNewsCount() {
-        let total = 0;
-        for (let portal in resultsData) {
-            total += resultsData[portal].length;
+
+    function cleanTitle(title, portalName) {
+        let cleaned = title;
+        const patterns = [/\s+[-|]\s+[A-Za-z0-9\s]+$/, /\s+[-|]\s+[A-Za-z0-9\s]+\.?$/];
+        for (let pattern of patterns) {
+            cleaned = cleaned.replace(pattern, '');
         }
-        return total;
+        return cleaned.trim();
     }
-    
+
     function formatDate(dateString) {
         try {
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return "";
-            const now = new Date();
-            const diffMs = now - date;
+            const ahora = new Date();
+            const diffMs = ahora - date;
             const diffMins = Math.floor(diffMs / 60000);
             const diffHours = Math.floor(diffMins / 60);
             const diffDays = Math.floor(diffHours / 24);
@@ -453,111 +483,164 @@
             return "";
         }
     }
-    
-    function highlightText(text, searchTerm) {
-        if (!searchTerm || !text) return text;
-        const term = searchTerm.toLowerCase();
-        const lowerText = text.toLowerCase();
-        if (lowerText.includes(term)) {
-            const regex = new RegExp(`(${escapeRegex(term)})`, 'gi');
-            return text.replace(regex, `<mark class="search-highlight">$1</mark>`);
+
+    async function loadAllNews() {
+        const container = document.getElementById("portalsContainer");
+        container.innerHTML = '<div class="loading">🔄 Cargando hasta 40 noticias por portal con feeds mejorados...<br><small>CNN · CBC · Infobae · La República</small></div>';
+        
+        let results = {};
+        
+        for (let portal of PORTALS) {
+            let allItems = [];
+            for (let feed of portal.feeds) {
+                try {
+                    console.log(`Cargando: ${portal.name} - ${feed.substring(0, 60)}...`);
+                    const items = await fetchRSSAsJSON(feed);
+                    if (items && items.length > 0) {
+                        allItems = allItems.concat(items);
+                    }
+                } catch (error) {
+                    console.error(`Error en feed de ${portal.name}:`, error);
+                }
+            }
+            
+            // Eliminar duplicados por título (primeros 80 caracteres)
+            const uniqueItems = [];
+            const titlesSeen = new Set();
+            for (let item of allItems) {
+                const titleKey = item.title.substring(0, 80);
+                if (!titlesSeen.has(titleKey)) {
+                    titlesSeen.add(titleKey);
+                    uniqueItems.push(item);
+                }
+            }
+            
+            // Aumentado a 40 noticias por portal para tener más contenido
+            const limitedItems = uniqueItems.slice(0, 40);
+            
+            if (limitedItems.length > 0) {
+                results[portal.name] = limitedItems.map(item => {
+                    const cleanTit = cleanTitle(item.title, portal.name);
+                    const cat = detectCategory(cleanTit, item.description || "", portal.lang);
+                    return {
+                        title: cleanTit,
+                        link: item.link,
+                        pubDate: item.pubDate,
+                        description: item.description?.replace(/<[^>]*>/g, '') || "",
+                        category: cat
+                    };
+                });
+                console.log(`✅ ${portal.name}: ${results[portal.name].length} noticias únicas`);
+            } else {
+                results[portal.name] = [];
+                console.log(`⚠️ ${portal.name}: Sin noticias disponibles`);
+            }
         }
-        return text;
+        
+        allNewsData = results;
+        updateStats();
+        render();
     }
-    
-    function escapeRegex(str) {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-    
-    function updateStatsAndRender() {
-        // Actualizar estadísticas
-        let total = getTotalNewsCount();
+
+    function updateStats() {
+        categoryCounts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
+        let total = 0;
+        
+        for (let portalName in allNewsData) {
+            for (let article of allNewsData[portalName]) {
+                categoryCounts[article.category]++;
+                total++;
+            }
+        }
+        
         const statsBar = document.getElementById("statsBar");
-        
-        if (currentTopic) {
-            statsBar.innerHTML = `
-                <span class="stat-badge">🔍 Tema: "${escapeHtml(currentTopic)}"</span>
-                <span class="stat-badge">📁 Categoría: ${getCategoryName(currentCategory)}</span>
-                <span class="stat-badge">📰 Total: ${total} noticias</span>
-            `;
-        } else {
-            statsBar.innerHTML = `<span class="stat-badge">📊 Esperando búsqueda...</span>`;
-        }
-        
-        // Renderizar resultados
-        renderResults();
+        statsBar.innerHTML = `
+            <span class="stat-badge">📰 Total: ${total} noticias</span>
+            <span class="stat-badge">🏛️ Política: ${categoryCounts.politica}</span>
+            <span class="stat-badge">📊 Economía: ${categoryCounts.economia}</span>
+            <span class="stat-badge">💻 Tecnología: ${categoryCounts.tecnologia}</span>
+            <span class="stat-badge">📰 General: ${categoryCounts.general}</span>
+        `;
     }
-    
-    function renderResults() {
+
+    function filterBySearch(articles) {
+        if (!currentSearchTerm.trim()) return articles;
+        const term = currentSearchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return articles.filter(art => {
+            const titleNorm = art.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const descNorm = art.description.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return titleNorm.includes(term) || descNorm.includes(term);
+        });
+    }
+
+    function render() {
         const container = document.getElementById("portalsContainer");
         
-        if (!currentTopic) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <span style="font-size: 2rem;">🔍</span><br><br>
-                    <strong>Escribe un tema y presiona "Buscar desde cero"</strong><br>
-                    <small>Ejemplo: "inflación" + filtro "Economía"</small>
-                </div>
-            `;
-            return;
-        }
-        
         let hasAnyNews = false;
-        for (let portal in resultsData) {
-            if (resultsData[portal] && resultsData[portal].length > 0) {
+        for (let portalName in allNewsData) {
+            if (allNewsData[portalName] && allNewsData[portalName].length > 0) {
                 hasAnyNews = true;
                 break;
             }
         }
         
         if (!hasAnyNews) {
-            container.innerHTML = `
-                <div class="no-results">
-                    <span style="font-size: 2.5rem;">😕</span>
-                    <h3>No se encontraron noticias</h3>
-                    <p>Sobre "<strong>${escapeHtml(currentTopic)}</strong>" en ${getCategoryName(currentCategory)}</p>
-                    <br>
-                    <small>💡 Sugerencias: Prueba con otro tema o cambia de categoría</small>
-                </div>
-            `;
+            container.innerHTML = `<div class="error-msg">
+                ⚠️ No se pudieron cargar noticias.<br><br>
+                🔄 Intenta recargar la página (F5)<br>
+                📡 Verifica tu conexión a internet
+            </div>`;
             return;
         }
         
+        let totalVisible = 0;
         let html = '<div class="portals-grid">';
         
-        for (let portalName in resultsData) {
-            const articles = resultsData[portalName];
+        for (let portalName in allNewsData) {
+            let articles = [...allNewsData[portalName]];
+            
+            // Aplicar filtro de categoría
+            if (currentFilter !== "all") {
+                articles = articles.filter(a => a.category === currentFilter);
+            }
+            
+            // Aplicar búsqueda
+            const originalLength = articles.length;
+            articles = filterBySearch(articles);
+            totalVisible += articles.length;
             
             html += `
                 <div class="portal-card">
                     <div class="portal-header">
-                        📰 ${portalName}
-                        <span class="portal-count">${articles.length} noticias</span>
+                        ${portalName}
+                        <span class="portal-count">${articles.length} / ${originalLength}</span>
                     </div>
                     <div class="news-list">
             `;
             
             if (articles.length === 0) {
-                html += `<div style="padding: 40px; text-align: center; color: #94a3b8;">
-                    📭 Sin resultados para "${escapeHtml(currentTopic)}"
+                html += `<div style="padding: 50px; text-align: center; color: #94a3b8;">
+                    📭 No hay coincidencias<br>
+                    <small>Prueba otra palabra o categoría</small>
                 </div>`;
             } else {
                 for (let art of articles) {
+                    let catClass = "";
+                    let catEmoji = "";
+                    if (art.category === "politica") { catClass = "cat-politica"; catEmoji = "🏛️"; }
+                    else if (art.category === "economia") { catClass = "cat-economia"; catEmoji = "📊"; }
+                    else if (art.category === "tecnologia") { catClass = "cat-tecnologia"; catEmoji = "💻"; }
+                    else { catClass = "cat-general"; catEmoji = "📰"; }
+                    
                     const fechaStr = formatDate(art.pubDate);
-                    let highlightedTitle = highlightText(art.title, currentTopic);
                     
                     html += `
                         <div class="news-item">
                             <a href="${art.link}" target="_blank" rel="noopener noreferrer" class="news-title">
-                                ${highlightedTitle}
+                                ${escapeHtml(art.title)}
                             </a>
                             <div class="news-meta">
-                                <span class="source-badge">📌 ${art.source || portalName}</span>
+                                <span class="category-badge ${catClass}">${catEmoji} ${art.category.charAt(0).toUpperCase() + art.category.slice(1)}</span>
                                 ${fechaStr ? `<span>🕒 ${fechaStr}</span>` : ''}
                             </div>
                         </div>
@@ -570,71 +653,57 @@
         
         html += '</div>';
         container.innerHTML = html;
-    }
-    
-    // NUEVA BÚSQUEDA DESDE CERO (cuando cambia el tema o la categoría)
-    async function performNewSearch() {
-        const input = document.getElementById("searchInput");
-        const newTopic = input.value.trim();
         
-        if (!newTopic) {
-            alert("✏️ Por favor escribe un tema para buscar");
-            return;
-        }
-        
-        // Cambiar el tema actual
-        currentTopic = newTopic;
-        
-        // Realizar nueva búsqueda con la categoría actual
-        await searchAllPortals();
-    }
-    
-    // Cambiar categoría y buscar NUEVAMENTE desde cero
-    async function changeCategory(category) {
-        if (currentCategory === category) return;
-        
-        currentCategory = category;
-        
-        // Actualizar UI de botones
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            if (btn.getAttribute('data-filter') === category) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-        
-        // Si ya hay un tema buscado, hacer NUEVA búsqueda con la nueva categoría
-        if (currentTopic) {
-            await searchAllPortals();
+        // Actualizar indicador de resultados
+        const resultDiv = document.getElementById("resultIndicator");
+        if (currentSearchTerm) {
+            resultDiv.innerHTML = `🔎 Resultados para "${escapeHtml(currentSearchTerm)}": <strong>${totalVisible}</strong> noticias encontradas`;
         } else {
-            updateStatsAndRender();
+            resultDiv.innerHTML = totalVisible > 0 ? `📌 Mostrando ${totalVisible} noticias` : "";
         }
     }
     
-    // Event Listeners
-    document.getElementById("searchBtn").addEventListener("click", performNewSearch);
-    document.getElementById("searchInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-            performNewSearch();
-        }
-    });
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
     
-    // Filtros de categoría - AHORA CAMBIAN LA BÚSQUEDA DESDE CERO
+    // ========== EVENTOS DEL BUSCADOR ==========
+    function performSearch() {
+        const input = document.getElementById("searchInput");
+        currentSearchTerm = input.value.trim();
+        render();
+    }
+    
+    function clearSearch() {
+        document.getElementById("searchInput").value = "";
+        currentSearchTerm = "";
+        render();
+    }
+    
+    // Eventos de filtro de categoría
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const category = btn.getAttribute('data-filter');
-            changeCategory(category);
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.getAttribute('data-filter');
+            render();
         });
     });
     
-    // Ejemplo inicial para demostrar que funciona
-    setTimeout(() => {
-        if (!currentTopic) {
-            document.getElementById("searchInput").value = "tecnología";
-            performNewSearch();
-        }
-    }, 300);
+    // Eventos del buscador
+    document.getElementById("searchBtn").addEventListener("click", performSearch);
+    document.getElementById("clearSearchBtn").addEventListener("click", clearSearch);
+    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") performSearch();
+    });
+    
+    loadAllNews();
 </script>
 </body>
 </html>
