@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Agregador de Noticias | 4 Portales · Buscador independiente</title>
+    <title>Agregador de Noticias | Búsqueda externa en 4 portales</title>
     <style>
         * {
             margin: 0;
@@ -90,10 +90,17 @@
         }
         .search-indicator {
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #1e3a8a;
             margin-bottom: 15px;
             font-weight: 500;
+            background: #e0f2fe;
+            padding: 8px;
+            border-radius: 40px;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
         }
         .filters {
             display: flex;
@@ -255,12 +262,13 @@
         <span class="stat-badge">📊 Cargando...</span>
     </div>
     
+    <!-- Buscador externo -->
     <div class="search-section">
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar en todos los portales (ej: cambio climático, IA, dólar...)" autocomplete="off">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar en todos los portales (ej: inflación, IA, elecciones...)" autocomplete="off">
         <button id="searchBtn" class="search-btn">🔍 Buscar desde cero</button>
         <button id="clearSearchBtn" class="clear-btn">✖️ Limpiar / Ver general</button>
     </div>
-    <div id="searchIndicator" class="search-indicator"></div>
+    <div id="searchIndicator" class="search-indicator" style="display: none;"></div>
     
     <div class="filters">
         <button class="filter-btn active" data-filter="all">🌐 Todas</button>
@@ -270,11 +278,11 @@
     </div>
     
     <div id="portalsContainer">
-        <div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...</div>
+        <div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...<br><small>CNN · CBC · Infobae · La República</small></div>
     </div>
     
     <button class="refresh-btn" id="refreshBtn">⟳ Recargar noticias actuales</button>
-    <footer>Fuentes: RSS oficial + Google News | Búsqueda independiente en cada portal | Hasta 40 noticias</footer>
+    <footer>Búsqueda externa en Google News + feeds oficiales | Cada búsqueda es independiente | Anti-caché activado</footer>
 </div>
 
 <script>
@@ -284,8 +292,7 @@
     let isSearchMode = false;
     let lastSearchTerm = "";
 
-    // ========== CONFIGURACIÓN DE PORTALES CON MÚLTIPLES FEEDS (GENERAL) ==========
-    // Se incluye RSS oficial de Infobae para garantizar resultados
+    // ========== PORTALES CON MÚLTIPLES FEEDS PARA CARGA GENERAL (mejorados) ==========
     const PORTALS_GENERAL = [
         { 
             name: "CNN Español", 
@@ -332,7 +339,7 @@
         }
     ];
 
-    // ========== PALABRAS CLAVE EXTENDIDAS (más de 250 términos) ==========
+    // PALABRAS CLAVE EXTENDIDAS (más de 250 términos)
     const KEYWORDS = {
         politica: {
             es: [
@@ -343,7 +350,7 @@
                 "trump", "biden", "milei", "petro", "boric", "lula", "amnistía", "impeachment", "referéndum",
                 "política exterior", "derechos humanos", "justicia", "fiscalía", "corrupción", "investigación",
                 "senado", "diputados", "asamblea", "vicepresidente", "canciller", "embajador", "tratado", "alianza",
-                "manifestación", "protesta", "presupuesto", "votación", "escrutinio", "balotaje"
+                "manifestación", "protesta", "presupuesto", "votación"
             ],
             en: [
                 "politics", "government", "president", "congress", "senate", "election", "minister", "law", "vote",
@@ -360,7 +367,7 @@
                 "banco central", "reservas", "tipo de cambio", "canasta básica", "pobreza", "startup", "negocios",
                 "rentabilidad", "ganancias", "pérdidas", "quiebra", "fusiones", "aranceles", "impuestos", "subsidios",
                 "jubilación", "moneda", "bitcoin", "cripto", "blockchain", "fintech", "crédito", "hipoteca",
-                "inflación núcleo", "salario mínimo", "riesgo país", "bonos", "swap"
+                "inflación núcleo", "salario mínimo", "riesgo país", "bonos"
             ],
             en: [
                 "economy", "economic", "market", "business", "bank", "investment", "dollar", "inflation", "gdp",
@@ -390,8 +397,12 @@
         }
     };
 
+    // Función para consumir RSS a JSON con anti-caché
     async function fetchRSSAsJSON(rssUrl) {
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+        // Añadir timestamp para evitar caché del navegador o del proxy
+        const cacheBreaker = `&_=${Date.now()}`;
+        const urlWithCache = rssUrl.includes('?') ? rssUrl + cacheBreaker : rssUrl + '?' + cacheBreaker.substring(1);
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(urlWithCache)}`;
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
@@ -456,13 +467,15 @@
         } catch(e) { return ""; }
     }
 
-    // Carga general (sin búsqueda)
+    // Carga de noticias generales (sin búsqueda)
     async function loadGeneralNews() {
         const container = document.getElementById("portalsContainer");
         container.innerHTML = '<div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...<br><small>Incluye RSS oficial de Infobae</small></div>';
         isSearchMode = false;
         lastSearchTerm = "";
-        document.getElementById("searchIndicator").innerHTML = "";
+        const indicator = document.getElementById("searchIndicator");
+        indicator.style.display = "none";
+        indicator.innerHTML = "";
         document.getElementById("searchInput").value = "";
         
         let results = {};
@@ -471,8 +484,67 @@
             for (let feed of portal.feeds) {
                 const items = await fetchRSSAsJSON(feed);
                 if (items && items.length) allItems = allItems.concat(items);
-                // Pequeña pausa para no saturar el proxy
-                await new Promise(r => setTimeout(r, 200));
+                await new Promise(r => setTimeout(r, 200)); // pequeña pausa
+            }
+            // Eliminar duplicados por título
+            const unique = [];
+            const seen = new Set();
+            for (let item of allItems) {
+                const key = item.title.substring(0, 80);
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(item);
+                }
+            }
+            const limited = unique.slice(0, 40);
+            results[portal.name] = limited.map(item => ({
+                title: cleanTitle(item.title),
+                link: item.link,
+                pubDate: item.pubDate,
+                description: item.description?.replace(/<[^>]*>/g, '') || "",
+                category: detectCategory(cleanTitle(item.title), item.description || "", portal.lang)
+            }));
+            console.log(`General - ${portal.name}: ${results[portal.name].length} noticias`);
+        }
+        allNewsData = results;
+        updateStats();
+        render();
+    }
+
+    // BÚSQUEDA EXTERNA DESDE CERO (no usa noticias previas)
+    async function searchNews(searchTerm) {
+        if (!searchTerm.trim()) return;
+        const container = document.getElementById("portalsContainer");
+        container.innerHTML = `<div class="loading">🔎 Buscando "<strong>${escapeHtml(searchTerm)}</strong>" en los 4 portales (consulta externa a Google News)...<br><small>Esto puede tomar unos segundos - resultados frescos</small></div>`;
+        isSearchMode = true;
+        lastSearchTerm = searchTerm;
+        const indicator = document.getElementById("searchIndicator");
+        indicator.style.display = "inline-block";
+        indicator.innerHTML = `🔍 Búsqueda externa: <strong>${escapeHtml(searchTerm)}</strong> — Consultando Google News + feeds oficiales...`;
+        
+        // Configuración de portales para búsqueda (sin site:, con términos más amplios)
+        // Usamos combinaciones: término + nombre del portal, término solo, y término + noticias
+        const searchPortals = [
+            { name: "CNN Español", base: "CNN+en+Español", lang: "es" },
+            { name: "CBC News", base: "CBC+News", lang: "en" },
+            { name: "Infobae", base: "Infobae", lang: "es" },
+            { name: "La República", base: "La+República+Colombia", lang: "es" }
+        ];
+        
+        let results = {};
+        for (let portal of searchPortals) {
+            const termEncoded = encodeURIComponent(searchTerm);
+            // Construimos 3 feeds diferentes para cada portal
+            const feeds = [
+                `https://news.google.com/rss/search?q=${termEncoded}+${portal.base}&hl=es-419&gl=US&ceid=US:es-419`,
+                `https://news.google.com/rss/search?q=${termEncoded}&hl=es-419&gl=US&ceid=US:es-419`,
+                `https://news.google.com/rss/search?q=${portal.base}+${termEncoded}&hl=es-419&gl=US&ceid=US:es-419`
+            ];
+            let allItems = [];
+            for (let feed of feeds) {
+                const items = await fetchRSSAsJSON(feed);
+                if (items && items.length) allItems = allItems.concat(items);
+                await new Promise(r => setTimeout(r, 250));
             }
             // Eliminar duplicados
             const unique = [];
@@ -492,65 +564,20 @@
                 description: item.description?.replace(/<[^>]*>/g, '') || "",
                 category: detectCategory(cleanTitle(item.title), item.description || "", portal.lang)
             }));
-            console.log(`${portal.name}: ${results[portal.name].length} noticias`);
-        }
-        allNewsData = results;
-        updateStats();
-        render();
-    }
-
-    // Búsqueda desde cero en los 4 portales con el término ingresado (sin usar resultados previos)
-    async function searchNews(searchTerm) {
-        if (!searchTerm.trim()) return;
-        const container = document.getElementById("portalsContainer");
-        container.innerHTML = `<div class="loading">🔎 Buscando "${escapeHtml(searchTerm)}" en cada portal (consulta independiente)...<br><small>Esto puede tomar unos segundos</small></div>`;
-        isSearchMode = true;
-        lastSearchTerm = searchTerm;
-        document.getElementById("searchIndicator").innerHTML = `🔍 Resultados para: <strong>${escapeHtml(searchTerm)}</strong> — Búsqueda fresca en todos los portales`;
-        
-        // Definir portales con consultas específicas que usan site:dominio para mayor precisión
-        const searchPortals = [
-            { name: "CNN Español", query: `site:cnnespanol.cnn.com+${encodeURIComponent(searchTerm)}`, lang: "es" },
-            { name: "CBC News", query: `site:cbc.ca+${encodeURIComponent(searchTerm)}`, lang: "en" },
-            { name: "Infobae", query: `site:infobae.com+${encodeURIComponent(searchTerm)}`, lang: "es" },
-            { name: "La República", query: `site:larepublica.co+${encodeURIComponent(searchTerm)}`, lang: "es" }
-        ];
-        
-        let results = {};
-        for (let portal of searchPortals) {
-            // Dos feeds: uno con site específico y otro genérico con el término + el nombre
-            const feed1 = `https://news.google.com/rss/search?q=${portal.query}&hl=es-419&gl=US&ceid=US:es-419`;
-            const feed2 = `https://news.google.com/rss/search?q=${encodeURIComponent(searchTerm)}+${encodeURIComponent(portal.name)}&hl=es-419&gl=US&ceid=US:es-419`;
-            let items1 = [], items2 = [];
-            try {
-                items1 = await fetchRSSAsJSON(feed1);
-                items2 = await fetchRSSAsJSON(feed2);
-                await new Promise(r => setTimeout(r, 200));
-            } catch(e) { console.error(e); }
-            let combined = [...items1, ...items2];
-            // Eliminar duplicados
-            const unique = [];
-            const seen = new Set();
-            for (let item of combined) {
-                const key = item.title.substring(0, 80);
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    unique.push(item);
-                }
-            }
-            const limited = unique.slice(0, 40);
-            results[portal.name] = limited.map(item => ({
-                title: cleanTitle(item.title),
-                link: item.link,
-                pubDate: item.pubDate,
-                description: item.description?.replace(/<[^>]*>/g, '') || "",
-                category: detectCategory(cleanTitle(item.title), item.description || "", portal.lang)
-            }));
             console.log(`Búsqueda "${searchTerm}" en ${portal.name}: ${results[portal.name].length} noticias`);
         }
+        
         allNewsData = results;
         updateStats();
         render();
+        
+        const totalNoticias = Object.values(results).reduce((acc, arr) => acc + arr.length, 0);
+        indicator.innerHTML = `✅ Búsqueda externa para "<strong>${escapeHtml(searchTerm)}</strong>" completada. Se encontraron <strong>${totalNoticias}</strong> noticias en total.`;
+        setTimeout(() => {
+            if (isSearchMode && lastSearchTerm === searchTerm) {
+                indicator.innerHTML = `🔍 Mostrando resultados para: <strong>${escapeHtml(searchTerm)}</strong> — Búsqueda independiente`;
+            }
+        }, 4000);
     }
 
     function updateStats() {
