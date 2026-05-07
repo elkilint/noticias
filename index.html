@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Agregador de Noticias | 4 Portales · Buscador externo</title>
+    <title>Agregador de Noticias | 4 Portales · Filtros Mejorados · Más noticias</title>
     <style>
         * {
             margin: 0;
@@ -45,47 +45,6 @@
             padding: 5px 15px;
             border-radius: 30px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .search-section {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .search-input {
-            padding: 8px 20px;
-            border-radius: 40px;
-            border: 1px solid #cbd5e1;
-            width: 280px;
-            font-size: 0.9rem;
-        }
-        .search-btn, .clear-search-btn {
-            padding: 8px 24px;
-            border: none;
-            border-radius: 40px;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            border: 1px solid #cbd5e1;
-            font-size: 0.85rem;
-        }
-        .search-btn {
-            background: #1e3a8a;
-            color: white;
-            border-color: #1e3a8a;
-        }
-        .search-btn:hover {
-            background: #0f2b3d;
-        }
-        .clear-search-btn:hover {
-            background: #e2e8f0;
-        }
-        .search-info {
-            text-align: center;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-            color: #1e3a8a;
-            font-weight: 500;
         }
         .filters {
             display: flex;
@@ -247,14 +206,6 @@
         <span class="stat-badge">📊 Cargando...</span>
     </div>
     
-    <!-- NUEVO: Buscador externo -->
-    <div class="search-section">
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar noticias (ej: inteligencia artificial, inflación...)" autocomplete="off">
-        <button id="searchBtn" class="search-btn">🔍 Buscar</button>
-        <button id="clearSearchBtn" class="clear-search-btn">✖️ Limpiar búsqueda</button>
-    </div>
-    <div id="searchInfo" class="search-info"></div>
-    
     <div class="filters">
         <button class="filter-btn active" data-filter="all">🌐 Todas</button>
         <button class="filter-btn" data-filter="politica">🏛️ Política</button>
@@ -263,21 +214,19 @@
     </div>
     
     <div id="portalsContainer">
-        <div class="loading">🔄 Cargando hasta 30 noticias por portal...<br><small>Optimizando filtros de economía · Esto puede tomar 5-8 segundos</small></div>
+        <div class="loading">🔄 Cargando hasta 40 noticias por portal...<br><small>Fuentes mejoradas: política, economía, tecnología</small></div>
     </div>
     
     <button class="refresh-btn" onclick="location.reload()">⟳ Actualizar todas las noticias</button>
-    <footer>Fuentes: RSS + Google News · El buscador consulta noticias nuevas en cada portal</footer>
+    <footer>Fuentes: RSS oficiales + Google News | Filtros optimizados con +180 palabras clave | Hasta 40 noticias por portal</footer>
 </div>
 
 <script>
     let currentFilter = "all";
     let allNewsData = {};
     let categoryCounts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
-    let isSearchMode = false;   // para saber si estamos en modo búsqueda
-    let lastSearchTerm = "";
 
-    // ========== PORTALES CON MÚLTIPLES FUENTES (MEJORADO - más noticias por categoría) ==========
+    // PORTALES CON MÚLTIPLES FUENTES (maximizar noticias de tecnología, política y economía)
     const PORTALS = [
         { 
             name: "CNN Español", 
@@ -303,7 +252,7 @@
         { 
             name: "Infobae", 
             feeds: [
-                "https://www.infobae.com/feeds/rss/",                         // RSS oficial
+                "https://www.infobae.com/feeds/rss/",  // RSS oficial (más fiable)
                 "https://news.google.com/rss/search?q=site:infobae.com+noticias&hl=es-419&gl=AR&ceid=AR:es-419",
                 "https://news.google.com/rss/search?q=site:infobae.com+economía&hl=es-419&gl=AR&ceid=AR:es-419",
                 "https://news.google.com/rss/search?q=site:infobae.com+política&hl=es-419&gl=AR&ceid=AR:es-419",
@@ -318,13 +267,13 @@
                 "https://www.larepublica.co/rss/tecnologia",
                 "https://www.larepublica.co/rss/empresas",
                 "https://news.google.com/rss/search?q=La+República+Colombia+política&hl=es-419&gl=CO&ceid=CO:es-419",
-                "https://news.google.com/rss/search?q=La+República+economía+colombiana&hl=es-419&gl=CO&ceid=CO:es-419"
+                "https://news.google.com/rss/search?q=La+República+tecnología+Colombia&hl=es-419&gl=CO&ceid=CO:es-419"
             ],
             lang: "es"
         }
     ];
 
-    // PALABRAS CLAVE EXTENSAS (+170 términos - se mantienen igual que original pero ampliadas)
+    // PALABRAS CLAVE EXTENSAS (+180 términos)
     const KEYWORDS = {
         politica: {
             es: [
@@ -416,13 +365,15 @@
         }
         
         let maxCat = "general";
-        let maxScore = 2;
+        let maxScore = 2; // umbral mínimo para considerar categoría específica
+        
         for (let cat in scores) {
             if (scores[cat] > maxScore) {
                 maxScore = scores[cat];
                 maxCat = cat;
             }
         }
+        
         return maxCat;
     }
 
@@ -455,12 +406,9 @@
         }
     }
 
-    // Función principal de carga general (original mejorada)
     async function loadAllNews() {
         const container = document.getElementById("portalsContainer");
-        container.innerHTML = '<div class="loading">🔄 Cargando hasta 30 noticias por portal...<br><small>CNN · CBC · Infobae · La República</small></div>';
-        isSearchMode = false;
-        document.getElementById("searchInfo").innerHTML = "";
+        container.innerHTML = '<div class="loading">🔄 Cargando hasta 40 noticias por portal...<br><small>CNN · CBC · Infobae · La República</small></div>';
         
         let results = {};
         
@@ -489,7 +437,9 @@
                 }
             }
             
-            const limitedItems = uniqueItems.slice(0, 35); // un poco más de noticias
+            // Aumentado a 40 noticias por portal
+            const limitedItems = uniqueItems.slice(0, 40);
+            
             if (limitedItems.length > 0) {
                 results[portal.name] = limitedItems.map(item => {
                     const cleanTit = cleanTitle(item.title, portal.name);
@@ -512,63 +462,6 @@
         allNewsData = results;
         updateStats();
         render();
-    }
-
-    // NUEVA FUNCIÓN: Búsqueda externa en los 4 portales con el término ingresado
-    async function searchNews(term) {
-        if (!term.trim()) return;
-        const container = document.getElementById("portalsContainer");
-        container.innerHTML = `<div class="loading">🔎 Buscando "<strong>${escapeHtml(term)}</strong>" en los 4 portales (consulta externa)...<br><small>Esto puede tomar unos segundos</small></div>`;
-        isSearchMode = true;
-        lastSearchTerm = term;
-        document.getElementById("searchInfo").innerHTML = `🔍 Buscando: <strong>${escapeHtml(term)}</strong> — noticias frescas desde cada sitio`;
-        
-        // Definir consultas específicas para cada portal (site:dominio + término)
-        const searchPortals = [
-            { name: "CNN Español", query: `site:cnnespanol.cnn.com+${encodeURIComponent(term)}`, lang: "es" },
-            { name: "CBC News", query: `site:cbc.ca+${encodeURIComponent(term)}`, lang: "en" },
-            { name: "Infobae", query: `site:infobae.com+${encodeURIComponent(term)}`, lang: "es" },
-            { name: "La República", query: `site:larepublica.co+${encodeURIComponent(term)}`, lang: "es" }
-        ];
-        
-        let results = {};
-        for (let portal of searchPortals) {
-            // Dos feeds para cada portal: uno con site y otro combinando término + nombre
-            const feed1 = `https://news.google.com/rss/search?q=${portal.query}&hl=es-419&gl=US&ceid=US:es-419`;
-            const feed2 = `https://news.google.com/rss/search?q=${encodeURIComponent(term)}+${encodeURIComponent(portal.name)}&hl=es-419&gl=US&ceid=US:es-419`;
-            let items1 = [], items2 = [];
-            try {
-                items1 = await fetchRSSAsJSON(feed1);
-                items2 = await fetchRSSAsJSON(feed2);
-                await new Promise(r => setTimeout(r, 200));
-            } catch(e) { console.error(e); }
-            let combined = [...items1, ...items2];
-            // Eliminar duplicados
-            const unique = [];
-            const seen = new Set();
-            for (let item of combined) {
-                const key = item.title.substring(0,80);
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    unique.push(item);
-                }
-            }
-            const limited = unique.slice(0, 35);
-            results[portal.name] = limited.map(item => ({
-                title: cleanTitle(item.title, portal.name),
-                link: item.link,
-                pubDate: item.pubDate,
-                description: item.description?.replace(/<[^>]*>/g, '') || "",
-                category: detectCategory(cleanTitle(item.title, portal.name), item.description || "", portal.lang)
-            }));
-            console.log(`Búsqueda "${term}" en ${portal.name}: ${results[portal.name].length} noticias`);
-        }
-        allNewsData = results;
-        updateStats();
-        render();
-        
-        const total = Object.values(results).reduce((a,b) => a + b.length, 0);
-        document.getElementById("searchInfo").innerHTML = `✅ Búsqueda externa para "<strong>${escapeHtml(term)}</strong>" completada. Se encontraron <strong>${total}</strong> noticias en total.`;
     }
 
     function updateStats() {
@@ -605,8 +498,9 @@
         
         if (!hasAnyNews) {
             container.innerHTML = `<div class="error-msg">
-                ⚠️ No se encontraron noticias para esta búsqueda.<br><br>
-                🔄 Intenta con otro término o <button onclick="location.reload()">recarga la página</button>
+                ⚠️ No se pudieron cargar noticias.<br><br>
+                🔄 Intenta recargar la página (F5)<br>
+                📡 Verifica tu conexión a internet
             </div>`;
             return;
         }
@@ -686,22 +580,6 @@
         });
     });
     
-    // Eventos del buscador
-    document.getElementById("searchBtn").addEventListener("click", () => {
-        const term = document.getElementById("searchInput").value.trim();
-        if (term === "") return;
-        searchNews(term);
-    });
-    document.getElementById("clearSearchBtn").addEventListener("click", () => {
-        // Limpiar campo y volver a cargar noticias generales
-        document.getElementById("searchInput").value = "";
-        loadAllNews();
-    });
-    document.getElementById("searchInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") document.getElementById("searchBtn").click();
-    });
-    
-    // Carga inicial
     loadAllNews();
 </script>
 </body>
