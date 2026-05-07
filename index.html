@@ -2,368 +2,137 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsHub Premium | Política, Economía y Tecnología</title>
+    <title>NewsHub Pro - Azul</title>
     <style>
-        :root {
-            --blue-900: #1e3a8a;
-            --blue-800: #1e40af;
-            --blue-700: #1d4ed8;
-            --blue-600: #2563eb;
-            --blue-500: #3b82f6;
-            --blue-100: #dbeafe;
-            --blue-50: #eff6ff;
-            --slate-700: #334155;
-            --slate-400: #94a3b8;
-        }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background-color: #f0f4f8;
-            color: var(--slate-700);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
+        :root { --blue-dark: #002d5b; --blue-mid: #0056b3; --blue-light: #eef6ff; }
+        body { font-family: sans-serif; background: #f4f7f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1400px; margin: 0 auto; }
+        header { text-align: center; background: var(--blue-dark); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        
+        /* Buscador y Botones */
+        .search-area { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: center; }
+        input { width: 60%; padding: 12px; border: 2px solid var(--blue-mid); border-radius: 5px; margin-bottom: 10px; }
+        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .btn-main { background: var(--blue-mid); color: white; }
+        .btn-quick { background: #e0e0e0; margin: 5px; color: var(--blue-dark); }
+        .btn-quick:hover { background: var(--blue-mid); color: white; }
 
-        /* Header & Logo */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        header h1 {
-            color: var(--blue-900);
-            font-size: 2.5rem;
-            letter-spacing: -1px;
-        }
-
-        header span { color: var(--blue-500); }
-
-        /* Search & Browser Area */
-        .browser-box {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            border: 1px solid var(--blue-100);
-        }
-
-        .search-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        input#searchInput {
-            flex: 1;
-            padding: 12px 20px;
-            border: 2px solid var(--blue-100);
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input#searchInput:focus { border-color: var(--blue-500); }
-
-        button {
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .btn-search {
-            background: var(--blue-700);
-            color: white;
-            padding: 0 25px;
-        }
-
-        .btn-search:hover { background: var(--blue-900); }
-
-        /* Quick Buttons */
-        .quick-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .btn-action {
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-acciones { background: var(--blue-100); color: var(--blue-900); }
-        .btn-stocks { background: var(--blue-600); color: white; }
-        .btn-ia { background: var(--blue-900); color: white; }
-
-        /* Filters */
-        .filters {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            background: white;
-            color: var(--blue-800);
-            border: 1px solid var(--blue-100);
-        }
-
-        .filter-btn.active {
-            background: var(--blue-800);
-            color: white;
-        }
-
-        /* News Grid */
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .portal-column {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            border-top: 4px solid var(--blue-800);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            height: 700px;
-        }
-
-        .portal-header {
-            padding: 15px;
-            background: var(--blue-50);
-            border-bottom: 1px solid var(--blue-100);
-            font-weight: bold;
-            color: var(--blue-900);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .news-container {
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .news-card {
-            padding: 15px;
-            border-bottom: 1px solid #f1f5f9;
-            transition: background 0.2s;
-        }
-
-        .news-card:hover { background: #f8fafc; }
-
-        .news-card a {
-            text-decoration: none;
-            color: #1e293b;
-            font-size: 0.95rem;
-            font-weight: 500;
-            line-height: 1.4;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .news-card a:hover { color: var(--blue-600); }
-
-        .tag {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .tag-politica { background: #fee2e2; color: #991b1b; }
-        .tag-economia { background: #dcfce7; color: #166534; }
-        .tag-tecnologia { background: #e0e7ff; color: #3730a3; }
-
-        .loader { text-align: center; padding: 40px; color: var(--blue-600); font-weight: bold; }
-
-        /* Scrollbar */
-        .news-container::-webkit-scrollbar { width: 6px; }
-        .news-container::-webkit-scrollbar-thumb { background: var(--blue-100); border-radius: 10px; }
+        /* Grid de Noticias */
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .column { background: white; border-top: 5px solid var(--blue-dark); border-radius: 8px; height: 600px; display: flex; flex-direction: column; }
+        .col-header { padding: 15px; background: var(--blue-light); font-weight: bold; border-bottom: 1px solid #ddd; }
+        .news-list { overflow-y: auto; flex-grow: 1; padding: 10px; }
+        .item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 0.9rem; }
+        .item a { text-decoration: none; color: #004085; font-weight: 600; display: block; margin-bottom: 5px; }
+        .item a:hover { text-decoration: underline; }
+        .tag { font-size: 0.7rem; background: #ddd; padding: 2px 5px; border-radius: 3px; }
+        
+        .loading { text-align: center; padding: 20px; color: var(--blue-mid); font-style: italic; }
+        .error { color: red; font-size: 0.8rem; padding: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>News<span>Hub</span> Explorer</h1>
-        <p>Monitoreo global en tiempo real</p>
+        <h1>NEWSHUB CORPORATE</h1>
+        <p>CNN · CBC · INFOBAE · LA REPUBLICA</p>
     </header>
 
-    <div class="browser-box">
-        <div class="search-row">
-            <input type="text" id="searchInput" placeholder="Escribe un tema para buscar noticias...">
-            <button class="btn-search" onclick="handleSearch()">Buscar en Portales</button>
-        </div>
-        <div class="quick-actions">
-            <button class="btn-action btn-acciones" onclick="quickSearch('acciones mercado')">📈 Acciones</button>
-            <button class="btn-action btn-stocks" onclick="quickSearch('stocks NASDAQ NYSE')">💹 Stocks</button>
-            <button class="btn-action btn-ia" onclick="quickSearch('inteligencia artificial AI')">🤖 IA</button>
+    <div class="search-area">
+        <input type="text" id="q" placeholder="Buscar tema específico...">
+        <button class="btn-main" onclick="searchAll()">BUSCAR AHORA</button>
+        <div style="margin-top:10px">
+            <button class="btn-quick" onclick="quick('acciones')">📈 Acciones</button>
+            <button class="btn-quick" onclick="quick('stocks')">💹 Stocks</button>
+            <button class="btn-quick" onclick="quick('inteligencia artificial')">🤖 IA</button>
         </div>
     </div>
 
-    <div class="filters">
-        <button class="filter-btn active" onclick="filterBy('all', this)">Todas</button>
-        <button class="filter-btn" onclick="filterBy('politica', this)">Política</button>
-        <button class="filter-btn" onclick="filterBy('economia', this)">Economía</button>
-        <button class="filter-btn" onclick="filterBy('tecnologia', this)">Tecnología</button>
-    </div>
-
-    <div class="news-grid" id="newsGrid">
-        <!-- Los portales se cargarán aquí -->
+    <div class="news-grid" id="grid">
+        <!-- Las columnas se generan por JS -->
     </div>
 </div>
 
 <script>
     const PORTALS = [
-        { id: 'cbc', name: 'CBC News (Canadá)', site: 'cbc.ca' },
-        { id: 'lr', name: 'La República (Colombia)', site: 'larepublica.co' },
-        { id: 'ib', name: 'Infobae Américas', site: 'infobae.com/america' },
-        { id: 'cnn', name: 'CNN en Español', site: 'cnnespanol.cnn.com' }
+        { id: 'cnn', name: 'CNN en Español', site: 'cnnespanol.cnn.com' },
+        { id: 'cbc', name: 'CBC News', site: 'cbc.ca' },
+        { id: 'infobae', name: 'Infobae', site: 'infobae.com/america' },
+        { id: 'republica', name: 'La República', site: 'larepublica.co' }
     ];
 
-    const CATEGORIES = {
-        politica: "política OR gobierno OR elecciones",
-        economia: "economía OR finanzas OR mercado",
-        tecnologia: "tecnología OR digital OR innovación"
-    };
-
-    let newsData = {};
-
-    async function fetchNews(portal, categoryKey) {
-        const query = `site:${portal.site} ${CATEGORIES[categoryKey]}`;
-        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=es-419&gl=CO&ceid=CO:es-419`;
-        // Usamos un proxy de código abierto para evitar CORS
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&api_key=oym8f9vjs6v0m981shn3yebpuz9p0vsk4oihyuvf`;
+    // Función principal para obtener noticias
+    async function getNews(portal, query) {
+        const fullQuery = `site:${portal.site} ${query}`;
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(fullQuery)}&hl=es-419&gl=CO&ceid=CO:es-419`;
+        
+        // Usamos un proxy secundario (allorigins) que es más estable para uso local
+        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
         
         try {
-            const response = await fetch(proxyUrl);
-            const data = await response.json();
-            return (data.items || []).map(item => ({
-                title: item.title.split(' - ')[0],
-                link: item.link,
-                category: categoryKey,
-                date: item.pubDate
-            }));
-        } catch (e) {
-            console.error("Error cargando " + portal.name, e);
-            return [];
-        }
-    }
-
-    async function init() {
-        const grid = document.getElementById('newsGrid');
-        grid.innerHTML = '<div class="loader">Extrayendo últimas noticias (20-30 por sección)...</div>';
-        
-        for (const portal of PORTALS) {
-            newsData[portal.id] = [];
+            const resp = await fetch(proxy);
+            const data = await resp.json();
             
-            // Traer noticias de las 3 categorías en paralelo
-            const results = await Promise.all([
-                fetchNews(portal, 'politica'),
-                fetchNews(portal, 'economia'),
-                fetchNews(portal, 'tecnologia')
-            ]);
+            // Parsear el XML del RSS manualmente
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+            const items = xmlDoc.querySelectorAll("item");
             
-            newsData[portal.id] = results.flat();
-            renderPortal(portal);
-        }
-        
-        // Remover loader inicial
-        const loader = grid.querySelector('.loader');
-        if (loader) loader.remove();
-    }
-
-    function renderPortal(portal, filter = 'all') {
-        let articles = newsData[portal.id];
-        if (filter !== 'all') {
-            articles = articles.filter(a => a.category === filter);
-        }
-
-        let portalDiv = document.getElementById(`portal-${portal.id}`);
-        
-        if (!portalDiv) {
-            portalDiv = document.createElement('div');
-            portalDiv.id = `portal-${portal.id}`;
-            portalDiv.className = 'portal-column';
-            document.getElementById('newsGrid').appendChild(portalDiv);
-        }
-
-        const html = `
-            <div class="portal-header">
-                ${portal.name}
-                <span style="font-size:0.7rem">${articles.length} noticias</span>
-            </div>
-            <div class="news-container">
-                ${articles.map(art => `
-                    <div class="news-card">
-                        <span class="tag tag-${art.category}">${art.category}</span>
-                        <a href="${art.link}" target="_blank">${art.title}</a>
-                        <div style="font-size:0.65rem; color:#94a3b8">${art.date}</div>
+            let html = '';
+            // Traer entre 20 y 30 resultados
+            const limit = Math.min(items.length, 30);
+            
+            for(let i=0; i < limit; i++) {
+                const title = items[i].querySelector("title").textContent;
+                const link = items[i].querySelector("link").textContent;
+                const date = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString();
+                
+                html += `
+                    <div class="item">
+                        <a href="${link}" target="_blank">${title.split(' - ')[0]}</a>
+                        <span class="tag">${date}</span>
                     </div>
-                `).join('')}
-            </div>
-        `;
-        portalDiv.innerHTML = html;
-    }
-
-    function filterBy(category, btn) {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        PORTALS.forEach(portal => renderPortal(portal, category));
-    }
-
-    async function handleSearch() {
-        const term = document.getElementById('searchInput').value;
-        if (!term) return;
-
-        const grid = document.getElementById('newsGrid');
-        grid.innerHTML = `<div class="loader">Buscando "${term}" en todos los portales...</div>`;
-
-        for (const portal of PORTALS) {
-            const query = `site:${portal.site} ${term}`;
-            const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=es-419&gl=CO&ceid=CO:es-419`;
-            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&api_key=oym8f9vjs6v0m981shn3yebpuz9p0vsk4oihyuvf`;
-            
-            try {
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                newsData[portal.id] = (data.items || []).map(item => ({
-                    title: item.title.split(' - ')[0],
-                    link: item.link,
-                    category: 'búsqueda',
-                    date: item.pubDate
-                }));
-                renderPortal(portal);
-            } catch (e) {}
+                `;
+            }
+            return html || '<p class="error">No se encontraron noticias recientes.</p>';
+        } catch (err) {
+            return `<p class="error">Error de conexión con el portal.</p>`;
         }
-        grid.querySelector('.loader')?.remove();
     }
 
-    function quickSearch(term) {
-        document.getElementById('searchInput').value = term;
-        handleSearch();
+    async function loadColumns(query = "política OR economía OR tecnología") {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = ''; // Limpiar
+
+        PORTALS.forEach(async (p) => {
+            // Crear la estructura de la columna inmediatamente
+            const col = document.createElement('div');
+            col.className = 'column';
+            col.innerHTML = `
+                <div class="col-header">${p.name}</div>
+                <div class="news-list" id="list-${p.id}"><p class="loading">Cargando...</p></div>
+            `;
+            grid.appendChild(col);
+
+            // Cargar el contenido
+            const content = await getNews(p, query);
+            document.getElementById(`list-${p.id}`).innerHTML = content;
+        });
     }
 
-    init();
+    function searchAll() {
+        const val = document.getElementById('q').value;
+        if(val) loadColumns(val);
+    }
+
+    function quick(topic) {
+        document.getElementById('q').value = topic;
+        loadColumns(topic);
+    }
+
+    // Carga inicial
+    window.onload = () => loadColumns();
 </script>
 
 </body>
