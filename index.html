@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Agregador de Noticias | 4 Portales · Buscador global · +120 Noticias</title>
+    <title>Agregador de Noticias | 4 Portales · Buscador independiente</title>
     <style>
         * {
             margin: 0;
@@ -255,11 +255,10 @@
         <span class="stat-badge">📊 Cargando...</span>
     </div>
     
-    <!-- BUSCADOR GLOBAL -->
     <div class="search-section">
-        <input type="text" id="searchInput" class="search-input" placeholder="Ej: inteligencia artificial, inflación, elecciones..." autocomplete="off">
-        <button id="searchBtn" class="search-btn">🔍 Buscar</button>
-        <button id="clearSearchBtn" class="clear-btn">✖️ Limpiar</button>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar en todos los portales (ej: cambio climático, IA, dólar...)" autocomplete="off">
+        <button id="searchBtn" class="search-btn">🔍 Buscar desde cero</button>
+        <button id="clearSearchBtn" class="clear-btn">✖️ Limpiar / Ver general</button>
     </div>
     <div id="searchIndicator" class="search-indicator"></div>
     
@@ -271,11 +270,11 @@
     </div>
     
     <div id="portalsContainer">
-        <div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...<br><small>Fuentes mejoradas: política, economía, tecnología</small></div>
+        <div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...</div>
     </div>
     
-    <button class="refresh-btn" id="refreshBtn">⟳ Actualizar noticias actuales</button>
-    <footer>Fuentes: RSS + Google News | Búsqueda independiente en los 4 portales | Hasta 40 noticias por portal</footer>
+    <button class="refresh-btn" id="refreshBtn">⟳ Recargar noticias actuales</button>
+    <footer>Fuentes: RSS oficial + Google News | Búsqueda independiente en cada portal | Hasta 40 noticias</footer>
 </div>
 
 <script>
@@ -285,7 +284,8 @@
     let isSearchMode = false;
     let lastSearchTerm = "";
 
-    // ========== PORTALES CON MÚLTIPLES FUENTES (carga general mejorada) ==========
+    // ========== CONFIGURACIÓN DE PORTALES CON MÚLTIPLES FEEDS (GENERAL) ==========
+    // Se incluye RSS oficial de Infobae para garantizar resultados
     const PORTALS_GENERAL = [
         { 
             name: "CNN Español", 
@@ -293,8 +293,7 @@
                 "https://news.google.com/rss/search?q=CNN+en+Español+noticias&hl=es-419&gl=US&ceid=US:es-419",
                 "https://news.google.com/rss/search?q=CNN+economía+América+Latina&hl=es-419&gl=US&ceid=US:es-419",
                 "https://news.google.com/rss/search?q=CNN+tecnología+innovación&hl=es-419&gl=US&ceid=US:es-419",
-                "https://news.google.com/rss/search?q=CNN+política+internacional&hl=es-419&gl=US&ceid=US:es-419",
-                "https://news.google.com/rss/search?q=CNN+Latinoamérica+elecciones&hl=es-419&gl=US&ceid=US:es-419"
+                "https://news.google.com/rss/search?q=CNN+política+internacional&hl=es-419&gl=US&ceid=US:es-419"
             ],
             lang: "es"
         },
@@ -305,19 +304,18 @@
                 "https://www.cbc.ca/cmlink/rss-politics",
                 "https://www.cbc.ca/cmlink/rss-business",
                 "https://news.google.com/rss/search?q=CBC+technology+news&hl=en-CA&gl=CA&ceid=CA:en",
-                "https://news.google.com/rss/search?q=CBC+economy+Canada&hl=en-CA&gl=CA&ceid=CA:en",
-                "https://news.google.com/rss/search?q=CBC+politics+Canada&hl=en-CA&gl=CA&ceid=CA:en"
+                "https://news.google.com/rss/search?q=CBC+economy+Canada&hl=en-CA&gl=CA&ceid=CA:en"
             ],
             lang: "en"
         },
         { 
             name: "Infobae", 
             feeds: [
-                "https://news.google.com/rss/search?q=Infobae+Argentina+noticias&hl=es-419&gl=AR&ceid=AR:es-419",
-                "https://news.google.com/rss/search?q=Infobae+economía&hl=es-419&gl=AR&ceid=AR:es-419",
-                "https://news.google.com/rss/search?q=Infobae+política+Argentina&hl=es-419&gl=AR&ceid=AR:es-419",
-                "https://news.google.com/rss/search?q=Infobae+tecnología+startups&hl=es-419&gl=AR&ceid=AR:es-419",
-                "https://news.google.com/rss/search?q=Infobae+Milei+economía&hl=es-419&gl=AR&ceid=AR:es-419"
+                "https://www.infobae.com/feeds/rss/",  // RSS oficial
+                "https://news.google.com/rss/search?q=site:infobae.com+noticias&hl=es-419&gl=AR&ceid=AR:es-419",
+                "https://news.google.com/rss/search?q=site:infobae.com+economía&hl=es-419&gl=AR&ceid=AR:es-419",
+                "https://news.google.com/rss/search?q=site:infobae.com+política&hl=es-419&gl=AR&ceid=AR:es-419",
+                "https://news.google.com/rss/search?q=site:infobae.com+tecnología&hl=es-419&gl=AR&ceid=AR:es-419"
             ],
             lang: "es"
         },
@@ -328,14 +326,13 @@
                 "https://www.larepublica.co/rss/tecnologia",
                 "https://www.larepublica.co/rss/empresas",
                 "https://news.google.com/rss/search?q=La+República+Colombia+política&hl=es-419&gl=CO&ceid=CO:es-419",
-                "https://news.google.com/rss/search?q=La+República+economía+colombiana&hl=es-419&gl=CO&ceid=CO:es-419",
-                "https://news.google.com/rss/search?q=La+República+tecnología+Colombia&hl=es-419&gl=CO&ceid=CO:es-419"
+                "https://news.google.com/rss/search?q=La+República+economía+colombiana&hl=es-419&gl=CO&ceid=CO:es-419"
             ],
             lang: "es"
         }
     ];
 
-    // Palabras clave mejoradas (más de 200 términos)
+    // ========== PALABRAS CLAVE EXTENDIDAS (más de 250 términos) ==========
     const KEYWORDS = {
         politica: {
             es: [
@@ -346,7 +343,7 @@
                 "trump", "biden", "milei", "petro", "boric", "lula", "amnistía", "impeachment", "referéndum",
                 "política exterior", "derechos humanos", "justicia", "fiscalía", "corrupción", "investigación",
                 "senado", "diputados", "asamblea", "vicepresidente", "canciller", "embajador", "tratado", "alianza",
-                "manifestación", "protesta", "leyes", "decretos", "presupuesto"
+                "manifestación", "protesta", "presupuesto", "votación", "escrutinio", "balotaje"
             ],
             en: [
                 "politics", "government", "president", "congress", "senate", "election", "minister", "law", "vote",
@@ -362,7 +359,8 @@
                 "precios", "petróleo", "gas", "energía", "crisis económica", "deuda", "fmi", "fondo monetario",
                 "banco central", "reservas", "tipo de cambio", "canasta básica", "pobreza", "startup", "negocios",
                 "rentabilidad", "ganancias", "pérdidas", "quiebra", "fusiones", "aranceles", "impuestos", "subsidios",
-                "jubilación", "moneda", "bitcoin", "cripto", "blockchain", "fintech", "crédito", "hipoteca"
+                "jubilación", "moneda", "bitcoin", "cripto", "blockchain", "fintech", "crédito", "hipoteca",
+                "inflación núcleo", "salario mínimo", "riesgo país", "bonos", "swap"
             ],
             en: [
                 "economy", "economic", "market", "business", "bank", "investment", "dollar", "inflation", "gdp",
@@ -378,7 +376,8 @@
                 "whatsapp", "tiktok", "youtube", "algoritmo", "datos", "big data", "cloud", "nube", "ciberseguridad",
                 "hacker", "virus", "malware", "5g", "wifi", "bluetooth", "realidad virtual", "metaverso", "nft",
                 "blockchain", "criptomoneda", "bitcoin", "ethereum", "programación", "desarrollador", "aplicación",
-                "plataforma", "streaming", "netflix", "spotify", "amazon", "tesla", "spacex", "chatgpt", "openai"
+                "plataforma", "streaming", "netflix", "spotify", "amazon", "tesla", "spacex", "chatgpt", "openai",
+                "machine learning", "deep learning", "robótica", "automatización", "drone"
             ],
             en: [
                 "technology", "tech", "software", "app", "internet", "digital", "artificial intelligence", "ai",
@@ -460,7 +459,7 @@
     // Carga general (sin búsqueda)
     async function loadGeneralNews() {
         const container = document.getElementById("portalsContainer");
-        container.innerHTML = '<div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...<br><small>Política · Economía · Tecnología</small></div>';
+        container.innerHTML = '<div class="loading">🔄 Cargando noticias generales (hasta 40 por portal)...<br><small>Incluye RSS oficial de Infobae</small></div>';
         isSearchMode = false;
         lastSearchTerm = "";
         document.getElementById("searchIndicator").innerHTML = "";
@@ -472,6 +471,8 @@
             for (let feed of portal.feeds) {
                 const items = await fetchRSSAsJSON(feed);
                 if (items && items.length) allItems = allItems.concat(items);
+                // Pequeña pausa para no saturar el proxy
+                await new Promise(r => setTimeout(r, 200));
             }
             // Eliminar duplicados
             const unique = [];
@@ -491,41 +492,43 @@
                 description: item.description?.replace(/<[^>]*>/g, '') || "",
                 category: detectCategory(cleanTitle(item.title), item.description || "", portal.lang)
             }));
+            console.log(`${portal.name}: ${results[portal.name].length} noticias`);
         }
         allNewsData = results;
         updateStats();
         render();
     }
 
-    // Búsqueda desde cero en los 4 portales con el término ingresado
+    // Búsqueda desde cero en los 4 portales con el término ingresado (sin usar resultados previos)
     async function searchNews(searchTerm) {
         if (!searchTerm.trim()) return;
         const container = document.getElementById("portalsContainer");
-        container.innerHTML = `<div class="loading">🔎 Buscando "${escapeHtml(searchTerm)}" en los 4 portales...<br><small>Esto puede tomar unos segundos</small></div>`;
+        container.innerHTML = `<div class="loading">🔎 Buscando "${escapeHtml(searchTerm)}" en cada portal (consulta independiente)...<br><small>Esto puede tomar unos segundos</small></div>`;
         isSearchMode = true;
         lastSearchTerm = searchTerm;
-        document.getElementById("searchIndicator").innerHTML = `🔍 Mostrando resultados para: <strong>${escapeHtml(searchTerm)}</strong> — Búsqueda independiente`;
+        document.getElementById("searchIndicator").innerHTML = `🔍 Resultados para: <strong>${escapeHtml(searchTerm)}</strong> — Búsqueda fresca en todos los portales`;
         
-        // Configuración de portales para búsqueda (usando Google News con site + término)
+        // Definir portales con consultas específicas que usan site:dominio para mayor precisión
         const searchPortals = [
-            { name: "CNN Español", query: `CNN+en+Español+${encodeURIComponent(searchTerm)}`, lang: "es" },
-            { name: "CBC News", query: `CBC+News+${encodeURIComponent(searchTerm)}`, lang: "en" },
-            { name: "Infobae", query: `Infobae+${encodeURIComponent(searchTerm)}`, lang: "es" },
-            { name: "La República", query: `La+República+Colombia+${encodeURIComponent(searchTerm)}`, lang: "es" }
+            { name: "CNN Español", query: `site:cnnespanol.cnn.com+${encodeURIComponent(searchTerm)}`, lang: "es" },
+            { name: "CBC News", query: `site:cbc.ca+${encodeURIComponent(searchTerm)}`, lang: "en" },
+            { name: "Infobae", query: `site:infobae.com+${encodeURIComponent(searchTerm)}`, lang: "es" },
+            { name: "La República", query: `site:larepublica.co+${encodeURIComponent(searchTerm)}`, lang: "es" }
         ];
         
         let results = {};
         for (let portal of searchPortals) {
-            // Construimos 2 feeds por portal para mayor cobertura: una con el término + nombre, otra solo el término
+            // Dos feeds: uno con site específico y otro genérico con el término + el nombre
             const feed1 = `https://news.google.com/rss/search?q=${portal.query}&hl=es-419&gl=US&ceid=US:es-419`;
-            const feed2 = `https://news.google.com/rss/search?q=${encodeURIComponent(searchTerm)}&hl=es-419&gl=US&ceid=US:es-419`;
+            const feed2 = `https://news.google.com/rss/search?q=${encodeURIComponent(searchTerm)}+${encodeURIComponent(portal.name)}&hl=es-419&gl=US&ceid=US:es-419`;
             let items1 = [], items2 = [];
             try {
                 items1 = await fetchRSSAsJSON(feed1);
                 items2 = await fetchRSSAsJSON(feed2);
+                await new Promise(r => setTimeout(r, 200));
             } catch(e) { console.error(e); }
             let combined = [...items1, ...items2];
-            // Eliminar duplicados por título
+            // Eliminar duplicados
             const unique = [];
             const seen = new Set();
             for (let item of combined) {
@@ -543,6 +546,7 @@
                 description: item.description?.replace(/<[^>]*>/g, '') || "",
                 category: detectCategory(cleanTitle(item.title), item.description || "", portal.lang)
             }));
+            console.log(`Búsqueda "${searchTerm}" en ${portal.name}: ${results[portal.name].length} noticias`);
         }
         allNewsData = results;
         updateStats();
@@ -573,7 +577,7 @@
         let hasNews = false;
         for (let p in allNewsData) if (allNewsData[p].length) { hasNews = true; break; }
         if (!hasNews) {
-            container.innerHTML = `<div class="error-msg">⚠️ No se encontraron noticias. Intenta otra palabra o recarga.</div>`;
+            container.innerHTML = `<div class="error-msg">⚠️ No se encontraron noticias. Intenta otra palabra o recarga la página.</div>`;
             return;
         }
         
