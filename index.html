@@ -32,7 +32,7 @@
             font-size: 0.9rem;
         }
         
-        /* ÁREA DE BÚSQUEDA - MEJORADA */
+        /* ÁREA DE BÚSQUEDA */
         .search-section {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             padding: 25px;
@@ -224,7 +224,6 @@
         .cat-politica { background: #fee2e2; color: #991b1b; }
         .cat-economia { background: #dcfce7; color: #166534; }
         .cat-tecnologia { background: #e0f2fe; color: #075985; }
-        .cat-general { background: #f1f5f9; color: #475569; }
         
         .loading, .error-msg, .no-results {
             text-align: center;
@@ -274,24 +273,22 @@
     <h1>📰 Buscador de Noticias</h1>
     <div class="sub">CNN Español · CBC Canada · Infobae · La República Colombia</div>
     
-    <!-- ÁREA DE BÚSQUEDA MEJORADA -->
+    <!-- ÁREA DE BÚSQUEDA -->
     <div class="search-section">
         <div class="search-label">🔍 ¿Qué quieres buscar?</div>
         <div class="search-box">
             <input type="text" class="search-input" id="searchInput" 
-                   placeholder="Ej: Inteligencia Artificial, Bitcoin, Milei, Cambio climático, Petróleo..." 
+                   placeholder="Ej: Inteligencia Artificial, Bitcoin, Cambio climático, Petróleo..." 
                    autocomplete="off">
             <button class="search-btn" id="searchBtn">Buscar</button>
         </div>
         <div class="search-examples">
-            <span class="example-tag" data-example="Inteligencia Artificial">🤖 IA</span>
+            <span class="example-tag" data-example="Inteligencia Artificial">🤖 Inteligencia Artificial</span>
             <span class="example-tag" data-example="Bitcoin">💰 Bitcoin</span>
-            <span class="example-tag" data-example="Milei">🇦🇷 Milei</span>
             <span class="example-tag" data-example="Cambio climático">🌍 Cambio climático</span>
             <span class="example-tag" data-example="Petróleo">🛢️ Petróleo</span>
             <span class="example-tag" data-example="Inflación">📈 Inflación</span>
             <span class="example-tag" data-example="Tecnología">💻 Tecnología</span>
-            <span class="example-tag" data-example="Guerra">⚔️ Guerra</span>
         </div>
     </div>
     
@@ -313,17 +310,17 @@
     </div>
     
     <button class="refresh-btn" onclick="location.reload()">⟳ Actualizar todas las noticias</button>
-    <footer>🔍 Escribe cualquier tema en la caja de búsqueda | Busca en TÍTULOS y DESCRIPCIONES de todas las noticias cargadas | Los resultados se resaltan en AMARILLO</footer>
+    <footer>🔍 Escribe cualquier tema en la caja de búsqueda | Los filtros (Política/Economía/Tecnología) funcionan sobre los resultados</footer>
 </div>
 
 <script>
     let currentFilter = "all";
     let currentSearchTerm = "";
     let allNewsData = {};
-    let categoryCounts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
+    let categoryCounts = { politica: 0, economia: 0, tecnologia: 0 };
     let isLoading = true;
 
-    // PORTALES CON SUS FEEDS (los que funcionan mejor)
+    // PORTALES CON SUS FEEDS
     const PORTALS = [
         { 
             name: "CNN Español", 
@@ -357,50 +354,46 @@
         }
     ];
 
-    // PALABRAS CLAVE PARA CATEGORÍAS
+    // PALABRAS CLAVE PARA CATEGORÍAS (MEJORADAS Y SIN GENERAL)
     const KEYWORDS = {
         politica: {
-            es: ["política","gobierno","presidente","congreso","senado","elección","ministro","ley","voto","diputado","municipio","alcalde","partido","milei","petro","biden","trump","sheinbaum","lula","justicia","fiscalía"],
-            en: ["politics","government","president","congress","senate","election","minister","law","vote","parliament","prime minister","justice"]
+            es: ["política","gobierno","presidente","congreso","senado","elección","ministro","ley","voto","diputado","alcalde","partido","justicia","fiscalía","cámara","parlamento","constitución","reforma","decreto","oposición"],
+            en: ["politics","government","president","congress","senate","election","minister","law","vote","parliament","justice","cabinet"]
         },
         economia: {
-            es: ["economía","dólar","inflación","mercado","banco","empresa","inversión","pib","petróleo","bitcoin","cripto","fintech","bolsa","acciones","divisas","tasa interés","recesión","desempleo","salario","precios","deuda"],
-            en: ["economy","dollar","inflation","market","bank","investment","bitcoin","crypto","stock","trade","recession","unemployment"]
+            es: ["economía","dólar","inflación","mercado","banco","empresa","inversión","pib","petróleo","bitcoin","cripto","fintech","bolsa","acciones","divisas","tasa","recesión","desempleo","salario","precios","deuda","exportación","importación","comercio"],
+            en: ["economy","dollar","inflation","market","bank","investment","bitcoin","crypto","stock","trade","recession","unemployment","debt"]
         },
         tecnologia: {
-            es: ["tecnología","software","app","internet","digital","inteligencia artificial","ia","robot","innovación","computación","móvil","apple","google","microsoft","startup","blockchain","datos","ciberseguridad","nube","cloud","5g"],
-            en: ["technology","tech","ai","artificial intelligence","software","app","internet","digital","robot","innovation","cloud","cybersecurity"]
+            es: ["tecnología","software","app","internet","digital","inteligencia artificial","ia","robot","innovación","computación","móvil","apple","google","microsoft","startup","blockchain","datos","ciberseguridad","nube","cloud","5g","hardware","programación"],
+            en: ["technology","tech","ai","artificial intelligence","software","app","internet","digital","robot","innovation","cloud","cybersecurity","data","blockchain"]
         }
     };
 
-    // MAPA DE SINÓNIMOS para mejorar la búsqueda
+    // MAPA DE SINÓNIMOS para búsqueda
     const SYNONYMS = {
-        "ia": ["inteligencia artificial", "ai", "artificial intelligence"],
-        "inteligencia artificial": ["ia", "ai", "artificial intelligence"],
+        "ia": ["inteligencia artificial", "artificial intelligence"],
+        "inteligencia artificial": ["ia", "artificial intelligence"],
         "bitcoin": ["btc", "criptomoneda", "cryptocurrency", "blockchain"],
         "cripto": ["bitcoin", "ethereum", "blockchain", "cryptocurrency"],
-        "milei": ["javier milei", "presidente argentina", "libertad avanza"],
-        "petro": ["gustavo petro", "presidente colombia"],
         "cambio climático": ["calentamiento global", "medio ambiente", "sostenibilidad", "clima"],
-        "guerra": ["conflicto", "militar", "ejército", "ataque", "rusia", "ucrania", "gaza", "israel"],
         "petróleo": ["crudo", "barril", "opep", "combustible"],
         "inflación": ["ipc", "precios", "costo vida", "devaluación"],
-        "tecnología": ["tech", "innovación", "digital", "startup"]
+        "tecnología": ["tech", "innovación", "digital", "startup"],
+        "guerra": ["conflicto", "militar", "ejército", "ataque"],
+        "clima": ["cambio climático", "calentamiento global", "medio ambiente"]
     };
 
-    // Normalizar texto (quitar acentos, minúsculas)
     function normalizeText(text) {
         return text.toLowerCase()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .replace(/[^a-z0-9\s]/g, "");
     }
 
-    // Expandir término de búsqueda con sinónimos
     function expandSearchTerm(term) {
         const normalizedTerm = normalizeText(term);
         let terms = [normalizedTerm];
         
-        // Buscar sinónimos
         for (let [key, synonyms] of Object.entries(SYNONYMS)) {
             if (normalizedTerm.includes(key) || key.includes(normalizedTerm)) {
                 terms = terms.concat(synonyms);
@@ -412,10 +405,9 @@
             }
         }
         
-        return [...new Set(terms)]; // Eliminar duplicados
+        return [...new Set(terms)];
     }
 
-    // Verificar si una noticia coincide con la búsqueda (usando sinónimos)
     function matchesSearch(article, searchTerm) {
         if (!searchTerm || searchTerm.trim() === "") return true;
         
@@ -463,14 +455,23 @@
             }
         }
         
-        let best = "general";
-        let bestScore = 2;
+        // Encontrar la categoría con mayor puntaje
+        let best = "politica";
+        let bestScore = 0;
         for (let cat in scores) {
             if (scores[cat] > bestScore) {
                 bestScore = scores[cat];
                 best = cat;
             }
         }
+        
+        // Si el puntaje es muy bajo, intentar detectar por contexto adicional
+        if (bestScore < 2) {
+            if (text.includes("voto") || text.includes("elección")) return "politica";
+            if (text.includes("mercado") || text.includes("precio")) return "economia";
+            if (text.includes("digital") || text.includes("app")) return "tecnologia";
+        }
+        
         return best;
     }
 
@@ -498,7 +499,7 @@
         let result = text;
         
         for (let term of expandedTerms) {
-            if (term.length < 3) continue; // Evitar términos muy cortos
+            if (term.length < 3) continue;
             try {
                 const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
                 result = result.replace(regex, `<span class="search-highlight">$1</span>`);
@@ -526,7 +527,6 @@
                 }
             }
             
-            // Eliminar duplicados
             const uniqueItems = [];
             const titlesSeen = new Set();
             for (let item of allItems) {
@@ -537,7 +537,6 @@
                 }
             }
             
-            // Aumentar a 50 noticias por portal
             const limitedItems = uniqueItems.slice(0, 50);
             
             if (limitedItems.length > 0) {
@@ -561,12 +560,10 @@
     }
 
     function updateStatsAndRender() {
-        let counts = { politica: 0, economia: 0, tecnologia: 0, general: 0 };
-        let totalBeforeFilter = 0;
+        let counts = { politica: 0, economia: 0, tecnologia: 0 };
         
         for (let portalName in allNewsData) {
             for (let article of allNewsData[portalName]) {
-                totalBeforeFilter++;
                 if (matchesSearch(article, currentSearchTerm)) {
                     counts[article.category]++;
                 }
@@ -575,21 +572,19 @@
         
         categoryCounts = counts;
         
-        const totalFiltered = counts.politica + counts.economia + counts.tecnologia + counts.general;
+        const totalFiltered = counts.politica + counts.economia + counts.tecnologia;
         
         document.getElementById("statsBar").innerHTML = `
             <span class="stat-badge">📰 Total: ${totalFiltered} noticias</span>
             <span class="stat-badge">🏛️ Política: ${counts.politica}</span>
             <span class="stat-badge">📊 Economía: ${counts.economia}</span>
             <span class="stat-badge">💻 Tecnología: ${counts.tecnologia}</span>
-            <span class="stat-badge">📰 General: ${counts.general}</span>
         `;
         
-        // Actualizar estado de búsqueda
         const searchStatus = document.getElementById("searchStatus");
         if (currentSearchTerm) {
             searchStatus.style.display = "block";
-            searchStatus.innerHTML = `🔍 Mostrando resultados para: <strong>"${escapeHtml(currentSearchTerm)}"</strong> | ${totalFiltered} noticias encontradas en los 4 portales`;
+            searchStatus.innerHTML = `🔍 Mostrando resultados para: <strong>"${escapeHtml(currentSearchTerm)}"</strong> | ${totalFiltered} noticias encontradas`;
         } else {
             searchStatus.style.display = "none";
         }
@@ -618,7 +613,7 @@
         for (let portalName in allNewsData) {
             let articles = [...allNewsData[portalName]];
             
-            // FILTRO DE BÚSQUEDA (con sinónimos)
+            // FILTRO DE BÚSQUEDA
             if (currentSearchTerm) {
                 articles = articles.filter(art => matchesSearch(art, currentSearchTerm));
             }
@@ -645,8 +640,8 @@
             } else {
                 for (let art of articles) {
                     let catClass = `cat-${art.category}`;
-                    let catName = { politica:"Política", economia:"Economía", tecnologia:"Tecnología", general:"General" }[art.category];
-                    let catEmoji = { politica:"🏛️", economia:"📊", tecnologia:"💻", general:"📰" }[art.category];
+                    let catName = { politica:"Política", economia:"Economía", tecnologia:"Tecnología" }[art.category];
+                    let catEmoji = { politica:"🏛️", economia:"📊", tecnologia:"💻" }[art.category];
                     
                     const fechaStr = formatDate(art.pubDate);
                     const highlightedTitle = highlightText(art.title, currentSearchTerm);
@@ -677,18 +672,10 @@
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
     
-    // Función de búsqueda
     function performSearch() {
         const searchInput = document.getElementById("searchInput");
         const newSearchTerm = searchInput.value.trim();
         currentSearchTerm = newSearchTerm;
-        updateStatsAndRender();
-    }
-    
-    function clearSearch() {
-        document.getElementById("searchInput").value = "";
-        currentSearchTerm = "";
-        document.getElementById("searchStatus").style.display = "none";
         updateStatsAndRender();
     }
     
@@ -707,7 +694,6 @@
         if (e.key === "Enter") performSearch();
     });
     
-    // Ejemplos con clic
     document.querySelectorAll(".example-tag").forEach(tag => {
         tag.addEventListener("click", () => {
             const example = tag.getAttribute("data-example");
